@@ -29,12 +29,16 @@ public class RequestHandler implements Runnable {
             BufferedReader br = new BufferedReader(new InputStreamReader(in, StandardCharsets.UTF_8));
 
             String line = br.readLine();
+
             String[] tokens = line.split(" ");
 
             String request_URL = tokens[1];     //  extract path
 
-            logger.debug("request line: {}", request_URL);
+            logger.debug("request line: {}", line);
 
+            while((line = br.readLine()) != null && !line.equals("")){
+                logger.debug("Header: {}", line);
+            }
 
             DataOutputStream dos = new DataOutputStream(out);
             byte[] body = Files.readAllBytes(new File("./src/main/resources/static/" + request_URL).toPath());
