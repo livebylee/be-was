@@ -34,12 +34,18 @@ public class WebServer {
             // 클라이언트가 연결될때까지 대기한다.
             Socket connection;
 
-            while ((connection = listenSocket.accept()) != null) {
+            while (true) {
+                connection = listenSocket.accept();
+                if(connection != null){
+                    executorService.execute(new RequestHandler(connection));
+                }
                 // 기존 thread 직접 생성 버전
                 //Thread thread = new Thread(new RequestHandler(connection));
                 //thread.start();
-                executorService.submit(new RequestHandler(connection));
             }
+        }finally {
+            logger.info("terminate thread pool" );
+            executorService.shutdown();
         }
     }
 }
