@@ -36,3 +36,7 @@
 > 
 > constraint : memeory, database connection pool , file descriptor  => using load test!
 
+> ### 스레드 풀이 꽉 차거나 거절당하면??
+> 
+> listenSocket.accept()를 통해 새로운 소켓 연결(connection)이 만들어짐 executorService.execute()에 던짐
+> 

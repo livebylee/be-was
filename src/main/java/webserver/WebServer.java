@@ -1,5 +1,6 @@
 package webserver;
 
+import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.concurrent.ExecutorService;
@@ -36,8 +37,15 @@ public class WebServer {
 
             while (true) {
                 connection = listenSocket.accept();
-                if(connection != null){
+                try {
                     executorService.execute(new RequestHandler(connection));
+                }catch (Exception e){
+                    logger.error("failed to execute request handler, closing connection", e);
+                    try{
+                        connection.close();
+                    }catch (IOException ioException){
+                        logger.error("failed to close connection",ioException);
+                    }
                 }
                 // 기존 thread 직접 생성 버전
                 //Thread thread = new Thread(new RequestHandler(connection));
