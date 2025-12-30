@@ -5,7 +5,7 @@ import java.net.Socket;
 import java.nio.charset.StandardCharsets;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
-import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -29,12 +29,15 @@ public class RequestHandler implements Runnable {
             BufferedReader br = new BufferedReader(new InputStreamReader(in, StandardCharsets.UTF_8));
 
             String line = br.readLine();
+            String[] tokens = line.split(" ");
 
-            logger.debug("request line: {}", line);
+            String request_URL = tokens[1];     //  extract path
+
+            logger.debug("request line: {}", request_URL);
 
 
             DataOutputStream dos = new DataOutputStream(out);
-            byte[] body = "<h1>Hello World</h1>".getBytes();
+            byte[] body = Files.readAllBytes(new File("./src/main/resources/static/" + request_URL).toPath());
             response200Header(dos, body.length);
             responseBody(dos, body);
         } catch (IOException e) {
