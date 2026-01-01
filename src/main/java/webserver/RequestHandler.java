@@ -26,7 +26,8 @@ public class RequestHandler implements Runnable {
             "js", "application/javascript",
             "ico", "image/x-icon",
             "png", "image/png",
-            "jpg", "image/jpeg"
+            "jpg", "image/jpeg",
+            "svg","image/svg+xml"
     );
 
     public void run() {
@@ -75,7 +76,9 @@ public class RequestHandler implements Runnable {
     private void response200Header(DataOutputStream dos, int lengthOfBodyContent, String contentType) {
         try {
             dos.writeBytes("HTTP/1.1 200 OK \r\n");
-            dos.writeBytes("Content-Type:" + contentType + ";charset=utf-8\r\n");
+            //dos.writeBytes("Content-Type: " + contentType + ";charset=utf-8\r\n");
+            dos.writeBytes("Content-Type: " + contentType +"\r\n");
+
             dos.writeBytes("Content-Length: " + lengthOfBodyContent + "\r\n");
             dos.writeBytes("\r\n");
         } catch (IOException e) {
