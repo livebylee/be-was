@@ -5,7 +5,6 @@ import java.net.Socket;
 import java.nio.charset.StandardCharsets;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
-import java.nio.file.Files;
 import java.util.Map;
 
 import org.slf4j.Logger;
@@ -40,9 +39,7 @@ public class RequestHandler implements Runnable {
             BufferedReader br = new BufferedReader(new InputStreamReader(in, StandardCharsets.UTF_8));
 
             String line = br.readLine();
-
             String[] tokens = line.split(" ");
-
             String request_URL = tokens[1];     //  extract path
 
             int index = request_URL.lastIndexOf(".");   //  extract extension
@@ -60,18 +57,18 @@ public class RequestHandler implements Runnable {
             }
 
             DataOutputStream dos = new DataOutputStream(out);
-
+            String resourcePath = "/static" + request_URL;
+            InputStream resourceStream = getClass().getResourceAsStream(resourcePath);
 
             //check file exist
-            File file = new File("./src/main/resources/static"+request_URL);
-
-            if(file.exists()){
-                byte[] body =
+            if(resourceStream == null){
+                logger.error("File Not Found: {}",resourcePath);
+                response404Header(dos);
+            }else{
+                byte[] body = readAllBytes(resourceStream);
+                response200Header(dos, body.length, contentType);
+                responseBody(dos, body);
             }
-            byte[] body = Files.readAllBytes(new File("./src/main/resources/static/" + request_URL).toPath());
-            response200Header(dos, body.length, contentType);
-            responseBody(dos, body);
-
         } catch (IOException e) {
             logger.error(e.getMessage());
         }
@@ -79,6 +76,18 @@ public class RequestHandler implements Runnable {
 
     private String findType(String extension){
         return mimeTypes.get(extension);
+    }
+
+    private byte[] readAllBytes(InputStream inputStream) throws IOException {
+        ByteArrayOutputStream buffer = new ByteArrayOutputStream();
+        int nRead;
+        byte[] data = new byte[1024]; // 1kb
+
+        while ((nRead = inputStream.read(data, 0, data.length)) != -1) {
+            buffer.write(data, 0, nRead);
+        }
+        buffer.flush();
+        return buffer.toByteArray();
     }
 
     private void response200Header(DataOutputStream dos, int lengthOfBodyContent, String contentType) {
@@ -113,4 +122,5 @@ public class RequestHandler implements Runnable {
             logger.error(e.getMessage());
         }
     }
+
 }
