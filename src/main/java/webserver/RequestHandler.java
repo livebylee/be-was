@@ -60,6 +60,14 @@ public class RequestHandler implements Runnable {
             }
 
             DataOutputStream dos = new DataOutputStream(out);
+
+
+            //check file exist
+            File file = new File("./src/main/resources/static"+request_URL);
+
+            if(file.exists()){
+                byte[] body =
+            }
             byte[] body = Files.readAllBytes(new File("./src/main/resources/static/" + request_URL).toPath());
             response200Header(dos, body.length, contentType);
             responseBody(dos, body);
@@ -81,6 +89,17 @@ public class RequestHandler implements Runnable {
 
             dos.writeBytes("Content-Length: " + lengthOfBodyContent + "\r\n");
             dos.writeBytes("\r\n");
+        } catch (IOException e) {
+            logger.error(e.getMessage());
+        }
+    }
+
+    private void response404Header(DataOutputStream dos){
+        try {
+            dos.writeBytes("HTTP/1.1 404 Not Found \r\n");
+            dos.writeBytes("Content-Type: text/html;\r\n");
+            dos.writeBytes("\r\n");
+            dos.writeBytes("<h1>404 not found</h1>");
         } catch (IOException e) {
             logger.error(e.getMessage());
         }
