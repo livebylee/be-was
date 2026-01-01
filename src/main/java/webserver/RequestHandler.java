@@ -49,7 +49,7 @@ public class RequestHandler implements Runnable {
             if(index >0){
                 extension = request_URL.substring(index+1);
             }
-            String extensionType = findType(extension);
+            String contentType = findType(extension);
             //logger.debug("extension: {}",extension);   // check extension
 
             logger.debug("request line: {}", line);
@@ -60,7 +60,7 @@ public class RequestHandler implements Runnable {
 
             DataOutputStream dos = new DataOutputStream(out);
             byte[] body = Files.readAllBytes(new File("./src/main/resources/static/" + request_URL).toPath());
-            response200Header(dos, body.length, extensionType);
+            response200Header(dos, body.length, contentType);
             responseBody(dos, body);
 
         } catch (IOException e) {
@@ -72,10 +72,10 @@ public class RequestHandler implements Runnable {
         return mimeTypes.get(extension);
     }
 
-    private void response200Header(DataOutputStream dos, int lengthOfBodyContent, String extensionType) {
+    private void response200Header(DataOutputStream dos, int lengthOfBodyContent, String contentType) {
         try {
             dos.writeBytes("HTTP/1.1 200 OK \r\n");
-            dos.writeBytes("Content-Type:" + extensionType + "charset=utf-8\r\n");
+            dos.writeBytes("Content-Type:" + contentType + ";charset=utf-8\r\n");
             dos.writeBytes("Content-Length: " + lengthOfBodyContent + "\r\n");
             dos.writeBytes("\r\n");
         } catch (IOException e) {
