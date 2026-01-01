@@ -14,7 +14,7 @@
 > - pre-allocation
 > - use task queue
 > - risk of too many thread ? Leads to high context switching overhead and OOM
-> - risk of too few thread ? cpu use down, throughput bacomeslow
+> - risk of too few thread ? cpu use down, throughput become slow
 
 
 > ### why use thread pool?
@@ -44,3 +44,14 @@
 
 -----
 > ###  MIME
+> 
+> Content type 
+
+
+----
+## step2
+- [x] 확장자 파싱하기
+- [ ] **MIME 타입 매핑**: 확장자(.html, .css, .js, .ico, .png, .jpg)별 Content-Type 결정 로직 구현
+- [ ] **파일 I/O 개선**: 텍스트 및 바이너리 파일(이미지 등) 지원을 위해 파일 읽기 방식을 `byte[]` 처리로 변경
+- [ ] **응답 헤더 동적화**: 결정된 MIME 타입과 파일 길이를 기반으로 `Content-Type`, `Content-Length` 헤더를 생성하도록 리팩토링
+- [ ] **통합 및 테스트**: 정적 리소스 요청 시 알맞은 헤더와 바디가 전송되는지 브라우저 개발자 도구로 검증

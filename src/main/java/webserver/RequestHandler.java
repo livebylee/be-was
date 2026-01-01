@@ -34,6 +34,13 @@ public class RequestHandler implements Runnable {
 
             String request_URL = tokens[1];     //  extract path
 
+            int index = request_URL.lastIndexOf(".");
+            String extension = "";
+            if(index >0){
+                extension = request_URL.substring(index+1);
+            }
+            logger.debug("extension: {}",extension);
+
             logger.debug("request line: {}", line);
 
             while((line = br.readLine()) != null && !line.equals("")){
@@ -44,6 +51,7 @@ public class RequestHandler implements Runnable {
             byte[] body = Files.readAllBytes(new File("./src/main/resources/static/" + request_URL).toPath());
             response200Header(dos, body.length);
             responseBody(dos, body);
+
         } catch (IOException e) {
             logger.error(e.getMessage());
         }
