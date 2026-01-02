@@ -55,3 +55,10 @@
 - [x] 타입에 맞춰 응답 헤더 전송
 
 
+> ### 확장자가 없는 요청에서 Content-Type 처리
+> 
+> - Dynamic HTML : `text/html`로 설정
+> - data(json) 보내 줄 때 : `application/json`
+> - redirection : body없거나 그러면 content-type 생략가능..?
+
+
