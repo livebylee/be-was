@@ -42,15 +42,21 @@ public class RequestHandler implements Runnable {
             String[] tokens = line.split(" ");
             String request_URL = tokens[1];     //  extract path
 
-            if(request_URL.equals("/")){
-                request_URL = "/index.html";
-            }
-            
-            int index = request_URL.lastIndexOf(".");   //  extract extension
+            int index = request_URL.lastIndexOf(".");
             String extension = "";
-            if(index >0){
-                extension = request_URL.substring(index+1);
+            if(index == -1){  // no file extension
+                if(request_URL.endsWith("/")){
+                    request_URL += "index.html";
+                }else{
+                    request_URL += "/index.html";
+                }
+                index = request_URL.lastIndexOf(("."));
             }
+
+            if (index > 0) {
+                extension = request_URL.substring(index + 1);
+            }
+
             String contentType = findType(extension);
             //logger.debug("extension: {}",extension);   // check extension
 

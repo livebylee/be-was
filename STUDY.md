@@ -57,6 +57,8 @@
 
 > ### 확장자가 없는 요청에서 Content-Type 처리
 > 
+> static file의 경우 파일 자체가 내용을 가지고 있지만 동적 요청에 경우 다를 수 있다
+> 
 > - Dynamic HTML : `text/html`로 설정
 > - data(json) 보내 줄 때 : `application/json`
 > - redirection : body없거나 그러면 content-type 생략가능..?
