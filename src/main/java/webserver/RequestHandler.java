@@ -39,45 +39,28 @@ public class RequestHandler implements Runnable {
             BufferedReader br = new BufferedReader(new InputStreamReader(in, StandardCharsets.UTF_8));
 
             String line = br.readLine();
+            if(line == null) return;
             String[] tokens = line.split(" ");
+            String method = tokens[0];
             String request_URL = tokens[1];     //  extract path
 
-            int index = request_URL.lastIndexOf(".");
-            String extension = "";
-            if(index == -1){  // no file extension
-                if(request_URL.endsWith("/")){
-                    request_URL += "index.html";
-                }else{
-                    request_URL += "/index.html";
-                }
-                index = request_URL.lastIndexOf(("."));
+            String path = request_URL;
+            String queryString = "";
+            int qindex = request_URL.lastIndexOf("?");
+
+            if(qindex != -1){  // data exist
+                path = request_URL.substring(0,qindex);
+                queryString = request_URL.substring(qindex+1);
             }
-
-            if (index > 0) {
-                extension = request_URL.substring(index + 1);
-            }
-
-            String contentType = findType(extension);
-            //logger.debug("extension: {}",extension);   // check extension
-
-            logger.debug("request line: {}", line);
 
             while((line = br.readLine()) != null && !line.equals("")){
                 logger.debug("Header: {}", line);
             }
 
-            DataOutputStream dos = new DataOutputStream(out);
-            String resourcePath = "/static" + request_URL;
-            InputStream resourceStream = getClass().getResourceAsStream(resourcePath);
-
-            //check file exist
-            if(resourceStream == null){
-                logger.error("File Not Found: {}",resourcePath);
-                response404Header(dos);
+            if(path.startsWith("/user/create")){
+                createUser(queryString, dos);
             }else{
-                byte[] body = readAllBytes(resourceStream);
-                response200Header(dos, body.length, contentType);
-                responseBody(dos, body);
+                responseStaticFile(path,dos);
             }
         } catch (IOException e) {
             logger.error(e.getMessage());
@@ -100,6 +83,39 @@ public class RequestHandler implements Runnable {
         return buffer.toByteArray();
     }
 
+    private void createUser(String queryString, DataOutputStream dos){
+        Map<String, String> params = parseQueryString(queryString);
+
+        //user 데이터 파싱 , 저장 로직
+        response302Header(dos,"/index.html");
+
+    }
+
+    private void responseStaticFile(String path, DataOutputStream dos){
+        if(path.equals("/")){
+            path = "/index.html";
+        }
+        String extension ="html";
+        int dotIndex = path.lastIndexOf(".");
+        if(dotIndex != -1){
+            extension = path.substring(dotIndex +1);
+        }
+        String contentType = findType(extension);
+
+        String resourcePath = "/static" + path;
+        InputStream resourceStream = getClass().getResourceAsStream(resourcePath);
+
+        if(resourceStream == null){
+            response404Header(dos);
+        }else{
+            byte[] body = readAllBytes(resourceStream);
+
+
+            response200Header(dos,body.length,contentType);
+            responseBody(dos,body);
+        }
+    }
+
     private void response200Header(DataOutputStream dos, int lengthOfBodyContent, String contentType) {
         try {
             dos.writeBytes("HTTP/1.1 200 OK \r\n");
@@ -119,6 +135,16 @@ public class RequestHandler implements Runnable {
             dos.writeBytes("Content-Type: text/html;\r\n");
             dos.writeBytes("\r\n");
             dos.writeBytes("<h1>404 not found</h1>");
+        } catch (IOException e) {
+            logger.error(e.getMessage());
+        }
+    }
+
+    private void response302Header(DataOutputStream dos, String url){
+        try {
+            dos.writeBytes("HTTP/1.1 302 Found \r\n");
+            dos.writeBytes("Location: " + url + " \r\n");
+            dos.writeBytes("\r\n");
         } catch (IOException e) {
             logger.error(e.getMessage());
         }
