@@ -42,6 +42,10 @@ public class RequestHandler implements Runnable {
             String[] tokens = line.split(" ");
             String request_URL = tokens[1];     //  extract path
 
+            if(request_URL.equals("/")){
+                request_URL = "/index.html";
+            }
+            
             int index = request_URL.lastIndexOf(".");   //  extract extension
             String extension = "";
             if(index >0){
