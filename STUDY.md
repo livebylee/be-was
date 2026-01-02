@@ -2,22 +2,22 @@
 
 ## HTTP 
 
-> ### when reading http request by one line, why need double check? ("" && null)
+> ### reading http request, why double check? ("" && null)
 > 
 > line.equals("") : 빈 문자열 , 헤더가 끝나고 본문 시작 전 정상적인 종료 시점
 > line == null : 데이터 없음 , 데이터가 안 들어옴 (물리적 스트림 종료)
 > 
 
 
-> ### thread pool ?
+> ### thread pool 
 > 
 > - pre-allocation
 > - use task queue
-> - if too many thread ? context switching overhead, oom 
-> - if too min thread ? cpu use down, throughout low
+> - risk of too many thread ? Leads to high context switching overhead and OOM
+> - risk of too few thread ? cpu use down, throughput bacomeslow
 
 
-> ### why use thraed pool?
+> ### why use thread pool?
 > 
 > thread per request 의 한계 해결
 > 
@@ -30,9 +30,17 @@
 
 > ### thread pool size?
 > 
-> if cpu bound task ) cpu core num + 1  : context switching mininum 
+> if cpu bound task ) cpu core num + 1  : minimize context switching
 > 
-> if I/O bound task ) n_cpu * u_cpu * (1 +wait time/compute time) '
+> if I/O bound task ) n_cpu * u_cpu * (1 +wait time/compute time) 
 > 
 > constraint : memeory, database connection pool , file descriptor  => using load test!
 
+> ### 스레드 풀이 꽉 차거나 거절당하면??
+> 
+> listenSocket.accept()를 통해 새로운 소켓 연결(connection)이 만들어짐 executorService.execute()에 던짐
+> 
+> execute()를 try-catch로 감싸고, 거절당한 경우 catch 블록에서 직접 socket.close()를 수행
+
+-----
+> ###  MIME
