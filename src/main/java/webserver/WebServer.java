@@ -25,7 +25,7 @@ public class WebServer {
 
         int cores = Runtime.getRuntime().availableProcessors();
         int threadpool_size = cores * 2;
-        logger.info(" Now Available Cores : {} , Thread pool Size : {} ",cores , threadpool_size);
+        logger.info(" Now Available Cores : {} , Thread pool Size : {} ", cores, threadpool_size);
 
         ExecutorService executorService = Executors.newFixedThreadPool(threadpool_size);
 
@@ -39,20 +39,20 @@ public class WebServer {
                 connection = listenSocket.accept();
                 try {
                     executorService.execute(new RequestHandler(connection));
-                }catch (Exception e){
+                } catch (Exception e) {
                     logger.error("failed to execute request handler, closing connection", e);
-                    try{
+                    try {
                         connection.close();
-                    }catch (IOException ioException){
-                        logger.error("failed to close connection",ioException);
+                    } catch (IOException ioException) {
+                        logger.error("failed to close connection", ioException);
                     }
                 }
                 // 기존 thread 직접 생성 버전
                 //Thread thread = new Thread(new RequestHandler(connection));
                 //thread.start();
             }
-        }finally {
-            logger.info("terminate thread pool" );
+        } finally {
+            logger.info("terminate thread pool");
             executorService.shutdown();
         }
     }
