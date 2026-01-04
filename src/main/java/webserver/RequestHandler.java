@@ -113,18 +113,24 @@ public class RequestHandler implements Runnable {
     }
 
     private void responseStaticFile(String path, DataOutputStream dos) {
-        if (path.equals("/")) {
-            path = "/index.html";
-        }
-        String extension = "html";
         int dotIndex = path.lastIndexOf(".");
+        if (dotIndex == -1 && !path.endsWith("/")) {
+            response302Header(dos, path + "/");
+            return;
+        }
+
+        if (path.endsWith("/")) {
+            path += "/index.html";
+        }
+
+        String extension = "html";
+        dotIndex = path.lastIndexOf(".");
         if (dotIndex != -1) {
             extension = path.substring(dotIndex + 1);
         }
         String contentType = findType(extension);
 
         String resourcePath = "/static" + path;
-
         try (InputStream resourceStream = getClass().getResourceAsStream(resourcePath)) {
             if (resourceStream == null) {
                 response404Header(dos);
