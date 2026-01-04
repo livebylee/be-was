@@ -64,3 +64,7 @@
 > - redirection : body없거나 그러면 content-type 생략가능..?
 
 
+> ### 
+> 
+> URLDecoder  브라우저가 인코딩해서 보낸 데이터를 원래의 문자열로 복구하는 과정
+> 

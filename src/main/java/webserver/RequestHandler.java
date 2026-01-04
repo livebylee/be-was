@@ -2,9 +2,11 @@ package webserver;
 
 import java.io.*;
 import java.net.Socket;
+import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
+import java.util.HashMap;
 import java.util.Map;
 
 import org.slf4j.Logger;
@@ -41,7 +43,7 @@ public class RequestHandler implements Runnable {
             String line = br.readLine();
             if(line == null) return;
             String[] tokens = line.split(" ");
-            String method = tokens[0];
+            String method = tokens[0];      //하드코딩 문제 tokens[1]이 없을 수도 있음
             String request_URL = tokens[1];     //  extract path
 
             String path = request_URL;
@@ -91,6 +93,24 @@ public class RequestHandler implements Runnable {
 
     }
 
+    private Map<String,String> parseQueryString(String queryString){
+        Map<String, String> params = new HashMap<>();
+        if(queryString == null || queryString.isEmpty()){
+            return params;
+        }
+        String[] pairs = queryString.split("&");
+        for (String pair : pairs){
+            String[] tokens = pair.split("=");
+            if(tokens.length == 2){
+                String key = tokens[0];
+                String value = URLDecoder.decode(tokens[1],StandardCharsets.UTF_8);
+                params.put(key,value);
+            }
+        }
+        return params;
+
+    }
+
     private void responseStaticFile(String path, DataOutputStream dos){
         if(path.equals("/")){
             path = "/index.html";
@@ -120,7 +140,7 @@ public class RequestHandler implements Runnable {
         try {
             dos.writeBytes("HTTP/1.1 200 OK \r\n");
             //dos.writeBytes("Content-Type: " + contentType + ";charset=utf-8\r\n");
-            dos.writeBytes("Content-Type: " + contentType +"\r\n");
+            dos.writeBytes("Content-Type: " + contentType +"\r\n");   // 형식 확인 ows field-value ows  ->
 
             dos.writeBytes("Content-Length: " + lengthOfBodyContent + "\r\n");
             dos.writeBytes("\r\n");
