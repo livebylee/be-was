@@ -5,7 +5,7 @@ import java.net.Socket;
 import java.nio.charset.StandardCharsets;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
-import java.nio.file.Files;
+import java.util.Map;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -19,6 +19,16 @@ public class RequestHandler implements Runnable {
         this.connection = connectionSocket;
     }
 
+    private static final Map<String, String> mimeTypes = Map.of(
+            "html", "text/html",
+            "css", "text/css",
+            "js", "application/javascript",
+            "ico", "image/x-icon",
+            "png", "image/png",
+            "jpg", "image/jpeg",
+            "svg","image/svg+xml"
+    );
+
     public void run() {
         logger.debug("New Client Connect! Connected IP : {}, Port : {}", connection.getInetAddress(),
                 connection.getPort());
@@ -29,10 +39,16 @@ public class RequestHandler implements Runnable {
             BufferedReader br = new BufferedReader(new InputStreamReader(in, StandardCharsets.UTF_8));
 
             String line = br.readLine();
-
             String[] tokens = line.split(" ");
-
             String request_URL = tokens[1];     //  extract path
+
+            int index = request_URL.lastIndexOf(".");   //  extract extension
+            String extension = "";
+            if(index >0){
+                extension = request_URL.substring(index+1);
+            }
+            String contentType = findType(extension);
+            //logger.debug("extension: {}",extension);   // check extension
 
             logger.debug("request line: {}", line);
 
@@ -41,20 +57,58 @@ public class RequestHandler implements Runnable {
             }
 
             DataOutputStream dos = new DataOutputStream(out);
-            byte[] body = Files.readAllBytes(new File("./src/main/resources/static/" + request_URL).toPath());
-            response200Header(dos, body.length);
-            responseBody(dos, body);
+            String resourcePath = "/static" + request_URL;
+            InputStream resourceStream = getClass().getResourceAsStream(resourcePath);
+
+            //check file exist
+            if(resourceStream == null){
+                logger.error("File Not Found: {}",resourcePath);
+                response404Header(dos);
+            }else{
+                byte[] body = readAllBytes(resourceStream);
+                response200Header(dos, body.length, contentType);
+                responseBody(dos, body);
+            }
         } catch (IOException e) {
             logger.error(e.getMessage());
         }
     }
 
-    private void response200Header(DataOutputStream dos, int lengthOfBodyContent) {
+    private String findType(String extension){
+        return mimeTypes.get(extension);
+    }
+
+    private byte[] readAllBytes(InputStream inputStream) throws IOException {
+        ByteArrayOutputStream buffer = new ByteArrayOutputStream();
+        int nRead;
+        byte[] data = new byte[1024]; // 1kb
+
+        while ((nRead = inputStream.read(data, 0, data.length)) != -1) {
+            buffer.write(data, 0, nRead);
+        }
+        buffer.flush();
+        return buffer.toByteArray();
+    }
+
+    private void response200Header(DataOutputStream dos, int lengthOfBodyContent, String contentType) {
         try {
             dos.writeBytes("HTTP/1.1 200 OK \r\n");
-            dos.writeBytes("Content-Type: text/html;charset=utf-8\r\n");
+            //dos.writeBytes("Content-Type: " + contentType + ";charset=utf-8\r\n");
+            dos.writeBytes("Content-Type: " + contentType +"\r\n");
+
             dos.writeBytes("Content-Length: " + lengthOfBodyContent + "\r\n");
             dos.writeBytes("\r\n");
+        } catch (IOException e) {
+            logger.error(e.getMessage());
+        }
+    }
+
+    private void response404Header(DataOutputStream dos){
+        try {
+            dos.writeBytes("HTTP/1.1 404 Not Found \r\n");
+            dos.writeBytes("Content-Type: text/html;\r\n");
+            dos.writeBytes("\r\n");
+            dos.writeBytes("<h1>404 not found</h1>");
         } catch (IOException e) {
             logger.error(e.getMessage());
         }
@@ -68,4 +122,5 @@ public class RequestHandler implements Runnable {
             logger.error(e.getMessage());
         }
     }
+
 }

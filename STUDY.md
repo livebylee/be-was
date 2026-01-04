@@ -14,7 +14,7 @@
 > - pre-allocation
 > - use task queue
 > - risk of too many thread ? Leads to high context switching overhead and OOM
-> - risk of too few thread ? cpu use down, throughput bacomeslow
+> - risk of too few thread ? cpu use down, throughput become slow
 
 
 > ### why use thread pool?
@@ -44,3 +44,13 @@
 
 -----
 > ###  MIME
+> 
+> Content type 
+
+
+----
+## step2
+- [x] 확장자 파싱하기
+- [x] MIME 타입 매핑하기  (ai: 확장자 map 만드는 과정)
+- [x] 타입에 맞춰 응답 헤더ß 전송
+- [ ] **통합 및 테스트**: 정적 리소스 요청 시 알맞은 헤더와 바디가 전송되는지 브라우저 개발자 도구로 검증
