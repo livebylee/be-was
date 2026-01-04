@@ -9,6 +9,8 @@ import java.io.InputStreamReader;
 import java.util.HashMap;
 import java.util.Map;
 
+import http.HttpResponse;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -39,6 +41,7 @@ public class RequestHandler implements Runnable {
              DataOutputStream dos = new DataOutputStream(out)) {
             // TODO 사용자 요청에 대한 처리는 이 곳에 구현하면 된다.
             // inputstream reader
+            HttpResponse response = new HttpResponse(out);
             BufferedReader br = new BufferedReader(new InputStreamReader(in, StandardCharsets.UTF_8));
 
             String line = br.readLine();
@@ -61,9 +64,9 @@ public class RequestHandler implements Runnable {
             }
 
             if (path.startsWith("/user/create")) {
-                createUser(queryString, dos);
+                createUser(queryString, response);
             } else {
-                responseStaticFile(path, dos);
+                responseStaticFile(path, response);
             }
         } catch (IOException e) {
             logger.error(e.getMessage());
@@ -86,11 +89,11 @@ public class RequestHandler implements Runnable {
         return buffer.toByteArray();
     }
 
-    private void createUser(String queryString, DataOutputStream dos) {
+    private void createUser(String queryString, HttpResponse response) {
         Map<String, String> params = parseQueryString(queryString);
 
         //user 데이터 파싱 , 저장 로직
-        response302Header(dos, "/index.html");
+        response.response302Header("/index.html");
 
     }
 
@@ -112,10 +115,10 @@ public class RequestHandler implements Runnable {
 
     }
 
-    private void responseStaticFile(String path, DataOutputStream dos) {
+    private void responseStaticFile(String path, HttpResponse response) {
         int dotIndex = path.lastIndexOf(".");
         if (dotIndex == -1 && !path.endsWith("/")) {
-            response302Header(dos, path + "/");
+            response.response302Header(path + "/");
             return;
         }
 
@@ -133,59 +136,16 @@ public class RequestHandler implements Runnable {
         String resourcePath = "/static" + path;
         try (InputStream resourceStream = getClass().getResourceAsStream(resourcePath)) {
             if (resourceStream == null) {
-                response404Header(dos);
+                response.response404Header();
                 return;
             }
             byte[] body = readAllBytes(resourceStream);
 
-            response200Header(dos, body.length, contentType);
-            responseBody(dos, body);
+            response.response200Header(body.length, contentType);
+            response.responseBody(body);
 
         } catch (IOException e) {
             logger.error("file read error");
-        }
-    }
-
-    private void response200Header(DataOutputStream dos, int lengthOfBodyContent, String contentType) {
-        try {
-            dos.writeBytes("HTTP/1.1 200 OK \r\n");
-            //dos.writeBytes("Content-Type: " + contentType + ";charset=utf-8\r\n");
-            dos.writeBytes("Content-Type: " + contentType + "\r\n");
-
-            dos.writeBytes("Content-Length: " + lengthOfBodyContent + "\r\n");
-            dos.writeBytes("\r\n");
-        } catch (IOException e) {
-            logger.error(e.getMessage());
-        }
-    }
-
-    private void response404Header(DataOutputStream dos) {
-        try {
-            dos.writeBytes("HTTP/1.1 404 Not Found \r\n");
-            dos.writeBytes("Content-Type: text/html;\r\n");
-            dos.writeBytes("\r\n");
-            dos.writeBytes("<h1>404 not found</h1>");
-        } catch (IOException e) {
-            logger.error(e.getMessage());
-        }
-    }
-
-    private void response302Header(DataOutputStream dos, String url) {
-        try {
-            dos.writeBytes("HTTP/1.1 302 Found \r\n");
-            dos.writeBytes("Location: " + url + " \r\n");
-            dos.writeBytes("\r\n");
-        } catch (IOException e) {
-            logger.error(e.getMessage());
-        }
-    }
-
-    private void responseBody(DataOutputStream dos, byte[] body) {
-        try {
-            dos.write(body, 0, body.length);
-            dos.flush();
-        } catch (IOException e) {
-            logger.error(e.getMessage());
         }
     }
 
