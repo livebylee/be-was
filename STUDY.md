@@ -1,16 +1,14 @@
-
-
-## HTTP 
+## HTTP
 
 > ### reading http request, why double check? ("" && null)
-> 
+>
 > line.equals("") : 빈 문자열 , 헤더가 끝나고 본문 시작 전 정상적인 종료 시점
 > line == null : 데이터 없음 , 데이터가 안 들어옴 (물리적 스트림 종료)
-> 
+>
 
 
-> ### thread pool 
-> 
+> ### thread pool
+>
 > - pre-allocation
 > - use task queue
 > - risk of too many thread ? Leads to high context switching overhead and OOM
@@ -18,81 +16,88 @@
 
 
 > ### why use thread pool?
-> 
+>
 > thread per request 의 한계 해결
-> 
+>
 > prevent oom, context switching overhead 조절
-> 
+>
 > reuse thread
-> 
+>
 > speed up (because no create thread)
 
 
 > ### thread pool size?
-> 
+>
 > if cpu bound task ) cpu core num + 1  : minimize context switching
-> 
-> if I/O bound task ) n_cpu * u_cpu * (1 +wait time/compute time) 
-> 
-> constraint : memeory, database connection pool , file descriptor  => using load test!
+>
+> if I/O bound task ) n_cpu * u_cpu * (1 +wait time/compute time)
+>
+> constraint : memeory, database connection pool , file descriptor => using load test!
 
 > ### 스레드 풀이 꽉 차거나 거절당하면??
-> 
+>
 > listenSocket.accept()를 통해 새로운 소켓 연결(connection)이 만들어짐 executorService.execute()에 던짐
-> 
+>
 > execute()를 try-catch로 감싸고, 거절당한 경우 catch 블록에서 직접 socket.close()를 수행
 
 -----
-> ###  MIME
-> 
-> Content type 
+> ### MIME
+>
+> Content type
 
 
 ----
+
 ## step2
+
 - [x] 확장자 파싱하기
 - [x] MIME 타입 매핑하기  (ai: 확장자 map 만드는 과정)
 - [x] 타입에 맞춰 응답 헤더 전송
 
-
 > ### 확장자가 없는 요청에서 Content-Type 처리
-> 
+>
 > static file의 경우 파일 자체가 내용을 가지고 있지만 동적 요청에 경우 다를 수 있다
-> 
+>
 > - Dynamic HTML : `text/html`로 설정
 > - data(json) 보내 줄 때 : `application/json`
 > - redirection : body없거나 그러면 content-type 생략가능..?
 
 
-> ### 
-> 
-> URLDecoder  브라우저가 인코딩해서 보낸 데이터를 원래의 문자열로 복구하는 과정
-> 
-> 
-> 
+> ###  
+>
+> URLDecoder 브라우저가 인코딩해서 보낸 데이터를 원래의 문자열로 복구하는 과정
+>
+>
+>
 -----
 
 > ### StringBuffer vs StringBuilder
-> 
+>
 > StringBuffer : synchronized, thread-safe (using lock)
-> 
+>
 > StringBuilder : not thread-safe ,faster
-> 
+>
 > StringBuilder structure : dynamic array , byte[] array
-> 
+>
 
 > ### the cost of resizing , (16자 초과 문자열 append)
-> 1. new array allocation in heap 
+> 1. new array allocation in heap
 > 2. data migration(`System.arraycopy`)
 > 3. change reference
 > 4. original array becomes unreachable state, target of GC
 
 
 > ### HTTP method's idempotent
-> 
+>
 > idempotent method : GET, PUT, DELETE(multiple identical request have the same effect as a single)
-> 
+>
 > non idempotent method : POST (multiple identical request may yield different result)
-> 
+>
 > ++) safe method : GET, HEAD  (never change state of server)
-> 
+>
+
+> ### InputStream / OutputStream
+>
+> byte-oriented, undirectional, abstraction
+> - InputStream : data pipe for read
+> - OutputStream : data pipe for write
