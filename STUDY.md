@@ -68,3 +68,31 @@
 > 
 > URLDecoder  브라우저가 인코딩해서 보낸 데이터를 원래의 문자열로 복구하는 과정
 > 
+> 
+> 
+-----
+
+> ### StringBuffer vs StringBuilder
+> 
+> StringBuffer : synchronized, thread-safe (using lock)
+> 
+> StringBuilder : not thread-safe ,faster
+> 
+> StringBuilder structure : dynamic array , byte[] array
+> 
+
+> ### the cost of resizing , (16자 초과 문자열 append)
+> 1. new array allocation in heap 
+> 2. data migration(`System.arraycopy`)
+> 3. change reference
+> 4. original array becomes unreachable state, target of GC
+
+
+> ### HTTP method's idempotent
+> 
+> idempotent method : GET, PUT, DELETE(multiple identical request have the same effect as a single)
+> 
+> non idempotent method : POST (multiple identical request may yield different result)
+> 
+> ++) safe method : GET, HEAD  (never change state of server)
+> 
