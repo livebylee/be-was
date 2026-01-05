@@ -25,6 +25,6 @@ public class UserHandler {
         logger.debug("New User created : {}", user);
         Database.addUser(user);
 
-        response.response302Header("./index.html");
+        response.response302Header("/index.html");
     }
 }
