@@ -7,6 +7,7 @@ import http.MimeType;
 import http.HttpRequest;
 import http.HttpResponse;
 
+import util.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -18,7 +19,6 @@ public class RequestHandler implements Runnable {
     public RequestHandler(Socket connectionSocket) {
         this.connection = connectionSocket;
     }
-
 
     public void run() {
         logger.debug("New Client Connect! Connected IP : {}, Port : {}", connection.getInetAddress(),
@@ -41,18 +41,6 @@ public class RequestHandler implements Runnable {
         } catch (IOException e) {
             logger.error(e.getMessage());
         }
-    }
-
-    private byte[] readAllBytes(InputStream inputStream) throws IOException {
-        ByteArrayOutputStream buffer = new ByteArrayOutputStream();
-        int nRead;
-        byte[] data = new byte[1024]; // 1kb
-
-        while ((nRead = inputStream.read(data, 0, data.length)) != -1) {
-            buffer.write(data, 0, nRead);
-        }
-        buffer.flush();
-        return buffer.toByteArray();
     }
 
     private void createUser(HttpResponse response) {
@@ -84,8 +72,7 @@ public class RequestHandler implements Runnable {
                 response.response404Header();
                 return;
             }
-            byte[] body = readAllBytes(resourceStream);
-
+            byte[] body = util.IOUtils.readAllBytes(resourceStream);
             response.response200Header(body.length, contentType);
             response.responseBody(body);
 
