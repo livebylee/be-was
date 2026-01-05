@@ -101,3 +101,15 @@
 > byte-oriented, undirectional, abstraction
 > - InputStream : data pipe for read
 > - OutputStream : data pipe for write
+
+
+> ### Static 
+> 
+> |                   |Static Method | Instance Method|
+> |-------------------|--------|------|
+> | Memory Location   | Method Area (static) | Heap Area |
+> | when allocation   | class is loaded | object is created using `new`|
+> | when destruction  | program terminated | GC reclaims the object |
+>
+> * `static` constraints : cannot use the `this` , instance variable
+

@@ -2,13 +2,8 @@ package webserver;
 
 import java.io.*;
 import java.net.Socket;
-import java.net.URLDecoder;
-import java.nio.charset.StandardCharsets;
-import java.io.BufferedReader;
-import java.io.InputStreamReader;
-import java.util.HashMap;
-import java.util.Map;
 
+import http.MimeType;
 import http.HttpRequest;
 import http.HttpResponse;
 
@@ -24,15 +19,6 @@ public class RequestHandler implements Runnable {
         this.connection = connectionSocket;
     }
 
-    private static final Map<String, String> mimeTypes = Map.of(
-            "html", "text/html",
-            "css", "text/css",
-            "js", "application/javascript",
-            "ico", "image/x-icon",
-            "png", "image/png",
-            "jpg", "image/jpeg",
-            "svg", "image/svg+xml"
-    );
 
     public void run() {
         logger.debug("New Client Connect! Connected IP : {}, Port : {}", connection.getInetAddress(),
@@ -55,10 +41,6 @@ public class RequestHandler implements Runnable {
         } catch (IOException e) {
             logger.error(e.getMessage());
         }
-    }
-
-    private String findType(String extension) {
-        return mimeTypes.get(extension);
     }
 
     private byte[] readAllBytes(InputStream inputStream) throws IOException {
@@ -94,7 +76,7 @@ public class RequestHandler implements Runnable {
         if (dotIndex != -1) {
             extension = path.substring(dotIndex + 1);
         }
-        String contentType = findType(extension);
+        String contentType = MimeType.getContentType(extension);
 
         String resourcePath = "/static" + path;
         try (InputStream resourceStream = getClass().getResourceAsStream(resourcePath)) {
