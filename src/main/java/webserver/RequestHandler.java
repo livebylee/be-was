@@ -6,6 +6,7 @@ import java.net.Socket;
 import http.HttpRequest;
 import http.HttpResponse;
 
+import model.UserHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -15,6 +16,7 @@ public class RequestHandler implements Runnable {
 
     private Socket connection;
     private static final StaticResourceProcessor processor = new StaticResourceProcessor();
+    private final UserHandler userHandler = new UserHandler();
 
     public RequestHandler(Socket connectionSocket) {
         this.connection = connectionSocket;
@@ -34,16 +36,12 @@ public class RequestHandler implements Runnable {
             String path = request.getPath();
 
             if (path.startsWith("/user/create")) {
-                createUser(response);
+                userHandler.createUser(request, response);
             } else {
                 processor.process(path, response);
             }
         } catch (IOException e) {
             logger.error(e.getMessage());
         }
-    }
-
-    private void createUser(HttpResponse response) {
-        response.response302Header("/index.html");
     }
 }

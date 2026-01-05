@@ -75,4 +75,8 @@ public class HttpRequest {
     public String getPath() {
         return this.path;
     }
+
+    public Map<String, String> getParams() {
+        return this.params;
+    }
 }
