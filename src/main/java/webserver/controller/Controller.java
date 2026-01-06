@@ -5,5 +5,5 @@ import http.HttpResponse;
 
 public interface Controller {
 
-    void process(HttpRequest request, HttpResponse);
+    void process(HttpRequest request, HttpResponse response);
 }

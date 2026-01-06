@@ -6,9 +6,10 @@ import java.net.Socket;
 import http.HttpRequest;
 import http.HttpResponse;
 
-import model.UserHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import webserver.controller.Controller;
+import webserver.controller.RequestMapping;
 
 
 public class RequestHandler implements Runnable {
@@ -16,7 +17,6 @@ public class RequestHandler implements Runnable {
 
     private Socket connection;
     private static final StaticResourceProcessor processor = new StaticResourceProcessor();
-    private final UserHandler userHandler = new UserHandler();
 
     public RequestHandler(Socket connectionSocket) {
         this.connection = connectionSocket;
@@ -34,10 +34,11 @@ public class RequestHandler implements Runnable {
             HttpResponse response = new HttpResponse(out);
 
             String path = request.getPath();
+            Controller controller = RequestMapping.getController(path);
 
-            if (path.startsWith("/user/create")) {
-                userHandler.createUser(request, response);
-            } else {
+            if (controller != null) {
+                controller.process(request, response);
+            } else {  // 컨트롤러 없을 때정적 파일 처리
                 processor.process(path, response);
             }
         } catch (IOException e) {
