@@ -86,4 +86,8 @@ public class HttpRequest {
     public Map<String, String> getParams() {
         return this.params;
     }
+
+    public HttpMethod getMethod(){
+        return this.method;
+    }
 }
