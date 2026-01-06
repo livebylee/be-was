@@ -13,11 +13,13 @@ import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Map;
 
+import static http.HttpMethod.from;
+
 
 public class HttpRequest {
     private static final Logger logger = LoggerFactory.getLogger(HttpResponse.class);
 
-    private String method;
+    private HttpMethod method;
     private String path;
     Map<String, String> params = new HashMap<>();
 
@@ -43,7 +45,7 @@ public class HttpRequest {
     private void parseRequestLine(String requestLine) {
         String[] tokens = requestLine.split(" ");
         if (tokens.length < 2) return; //method, path도 없는 경우
-        this.method = tokens[0];
+        this.method = from(tokens[0]);
         parseUrl(tokens[1]);
     }
 
