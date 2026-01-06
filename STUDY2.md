@@ -1,7 +1,7 @@
 --------
 #### 0106 Goal
  - [x] http method Enum 으로 분리
- - [] url parsing logic update 예외 처리..
+ - [x] url parsing logic update
  - [] 테스트 케이스 추가
  - [] 4단계 
  - [] 상태코드 공부하고, 적절한 상태코드 적용하기
@@ -25,4 +25,26 @@
 > 현재 실행 로직 : `RequestHandler` 가 `RequestMapping.getController(path)`호출하고,
 핸들러를 찾아 `process()`메서드로 해당하는 핸들러의 실제 로직이 실행된다. Map에 등록된 
 Controller 가 없다면, 정적리소스 처리를 위해 `StaticResourceProcessor`로 넘어간다.
+
+### HTTP status code
+```
+1xx (Informational)	: 요청을 받았으며 작업을 계속 진행 중임
+2xx (Successful)	: 요청을 성공적으로 처리함	
+3xx (Redirection)	: 요청을 완료하려면 추가 동작이 필요함	
+4xx (Client Error)	: 클라이언트의 요청에 문제가 있음
+5xx (Server Error)	: 서버가 유효한 요청을 처리하지 못함
+```
+
+### 에러 처리 
+```
+private void parseRequestLine(String requestLine) {
+  String[] tokens = requestLine.split(" ");
+  if (tokens.length < 2) return; //method, path도 없는 경우
+  this.method = from(tokens[0]);
+  parseUrl(tokens[1]);
+}
+```
+그룹 세션 진행 중, 잘못된 요청에 대해 그냥 return을 하고있는 문제를 발견했다. 그냥 리턴하는게 아니라
+예외 처리 로직이 필요하고, 상태코드를 반환해줘야한다.
+
 

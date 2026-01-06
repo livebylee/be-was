@@ -43,8 +43,13 @@ public class HttpRequest {
 
     // 여기 하드코딩 바꾸기
     private void parseRequestLine(String requestLine) {
+        if (requestLine == null || requestLine.isEmpty()) {
+            throw new IllegalArgumentException("Empty reqeust line");
+        }
         String[] tokens = requestLine.split(" ");
-        if (tokens.length < 2) return; //method, path도 없는 경우
+        if (tokens.length < 2) {//method, path도 없는 경우
+            throw new IllegalArgumentException("Invalid Http Request Line");
+        }
         this.method = from(tokens[0]);
         parseUrl(tokens[1]);
     }

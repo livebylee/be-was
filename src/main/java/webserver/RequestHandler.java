@@ -30,16 +30,22 @@ public class RequestHandler implements Runnable {
              DataOutputStream dos = new DataOutputStream(out)) {
             // TODO 사용자 요청에 대한 처리는 이 곳에 구현하면 된다.
             // inputstream reader
-            HttpRequest request = new HttpRequest(in);
-            HttpResponse response = new HttpResponse(out);
+            try {
+                HttpRequest request = new HttpRequest(in);
+                HttpResponse response = new HttpResponse(out);
 
-            String path = request.getPath();
-            Controller controller = RequestMapping.getController(path);
+                String path = request.getPath();
+                Controller controller = RequestMapping.getController(path);
 
-            if (controller != null) {
-                controller.process(request, response);
-            } else {  // 컨트롤러 없을 때정적 파일 처리
-                processor.process(path, response);
+                if (controller != null) {
+                    controller.process(request, response);
+                } else {  // 컨트롤러 없을 때정적 파일 처리
+                    processor.process(path, response);
+                }
+            } catch (IllegalArgumentException e) {
+                logger.error("Bad Request: {}", e.getMessage());
+                HttpResponse response = new HttpResponse(out);
+                //response.response404header  //추후 구현
             }
         } catch (IOException e) {
             logger.error(e.getMessage());
