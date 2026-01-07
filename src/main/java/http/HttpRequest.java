@@ -2,6 +2,7 @@ package http;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import util.IOUtils;
 import webserver.RequestHandler;
 
 import java.io.BufferedReader;
@@ -21,7 +22,8 @@ public class HttpRequest {
 
     private HttpMethod method;
     private String path;
-    Map<String, String> params = new HashMap<>();
+    private Map<String, String> headers = new HashMap<>();
+    private Map<String, String> params = new HashMap<>();
 
 
     public HttpRequest(InputStream in) {
@@ -29,8 +31,17 @@ public class HttpRequest {
             BufferedReader br = new BufferedReader(new InputStreamReader(in, StandardCharsets.UTF_8));
             String line = br.readLine();
             if (line == null) return;
-
             parseRequestLine(line);
+
+            while ((line = br.readLine()) != null && !line.equals("")) {
+                String[] headerTokens = line.split(":");
+                if (headerTokens.length >= 2) {
+                    String key = headerTokens[0].trim();
+                    String value = line.substring(line.indexOf(":") + 1).trim();
+                    headers.put(key, value);
+                }
+                HttpRequest.logger.debug("Header: {}", line);
+            }
 
             while ((line = br.readLine()) != null && !line.equals("")) {
                 HttpRequest.logger.debug("Header: {}", line);
@@ -87,7 +98,7 @@ public class HttpRequest {
         return this.params;
     }
 
-    public HttpMethod getMethod(){
+    public HttpMethod getMethod() {
         return this.method;
     }
 }
