@@ -43,9 +43,15 @@ public class HttpRequest {
                 HttpRequest.logger.debug("Header: {}", line);
             }
 
-            while ((line = br.readLine()) != null && !line.equals("")) {
-                HttpRequest.logger.debug("Header: {}", line);
+            if (method == HttpMethod.POST) {
+                String length = headers.get("Content-Length");
+                if (length != null) {
+                    int contentLength = Integer.parseInt(length);
+                    String body = IOUtils.readData(br, contentLength);
+                    this.params.putAll(HttpRequestUtils.parseQueryString(body));
+                }
             }
+
 
         } catch (IOException e) {
             throw new RuntimeException(e);
