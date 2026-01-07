@@ -24,7 +24,7 @@
 > 
 > 현재 실행 로직 : `RequestHandler` 가 `RequestMapping.getController(path)`호출하고,
 핸들러를 찾아 `process()`메서드로 해당하는 핸들러의 실제 로직이 실행된다. Map에 등록된 
-Controller 가 없다면, 정적리소스 처리를 위해 `StaticResourceProcessor`로 넘어간다.
+Controller 가 없다면, 정적[WebServer.java](src/main/java/webserver/WebServer.java)리소스 처리를 위해 `StaticResourceProcessor`로 넘어간다.
 
 ### HTTP status code
 ```
@@ -52,4 +52,21 @@ private void parseRequestLine(String requestLine) {
 > 
 > 메서드를 컨트롤러에 인자로 넘겨야할까? 
 > -> 매핑 자체에 경로랑 메서드를 같이 넣자! 컨트롤러 결정 시에 메서드 확인해야하니까!
-> 기존의 map에서 key를 (경로,메서드) 형태로 할 수 있을까?
+> 기존의 map에서 key를 (경로,메서드) 형태로 할 수 있을까? 이걸 어떤 문법으로? 어떻게 할 수 있는지, ai 활용 
+
+> record class type을 보고 map의 key를 record로 만들어 처리하였다.
+
+
+
+#### 0107 Goal
+- map method add
+- response refactoring
+- step4 finish
+
+
+> ### Java `Record` : class type
+> 
+> - immutable data 객체 쉽게 만들 수 있다
+> - 간결성, 메서드 자동 생성, 생성자 자동 생성, 불변성
+> - 응답 데이터 담을 때, 복합 키, 임시 데이터 구조 필요할때
+> - 비즈니스 로직 없 데이터만 전달하는!
