@@ -3,6 +3,7 @@ package webserver;
 import java.io.*;
 import java.net.Socket;
 
+import http.HttpMethod;
 import http.HttpRequest;
 import http.HttpResponse;
 
@@ -35,11 +36,14 @@ public class RequestHandler implements Runnable {
                 HttpResponse response = new HttpResponse(out);
 
                 String path = request.getPath();
-                Controller controller = RequestMapping.getController(path);
+                HttpMethod method = request.getMethod();
+                Controller controller = RequestMapping.getController(method, path);
 
                 if (controller != null) {
                     controller.process(request, response);
-                } else {  // 컨트롤러 없을 때정적 파일 처리
+                } else if (RequestMapping.existUrl(path)) {  //url 있는데 메소드 다름
+                    //response.response405; //추후 구현
+                } else {
                     processor.process(path, response);
                 }
             } catch (IllegalArgumentException e) {

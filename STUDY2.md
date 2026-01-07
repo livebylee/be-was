@@ -69,4 +69,27 @@ private void parseRequestLine(String requestLine) {
 > - immutable data 객체 쉽게 만들 수 있다
 > - 간결성, 메서드 자동 생성, 생성자 자동 생성, 불변성
 > - 응답 데이터 담을 때, 복합 키, 임시 데이터 구조 필요할때
-> - 비즈니스 로직 없 데이터만 전달하는!
+> - 비즈니스 로직 없이 데이터만 전달하는!
+
+
+> ### `RequestMapping` 에서 method와 url을 키로 사용해 handler를 매핑하기 위해 record 도입에 대해,
+> 
+> Q. `ReqeustMapping` 내부 메서드 `getController`에서 반환 시마다 record 객체를 매번 생성하는 것 같은데 비효율적이지 않은가?
+> A. JVM은 객체 생성이 매우 빠르고, record와 같은 작은 객체는 memory의 `Eden` 영역에 할당된다. 여기서 생성된 record는 메소드 종료와 동시에
+참조가 되지 않아 gc가 빠르게 정리한다. 하나의 객체를 재사용하면서 동기화 처리 등을 생각하는 거 보다 매번 생성하는 것이 낫다
+
+> ### `RequestMapping` 의 구조
+> 
+> url 매핑의 예외처리를 생각해본다면,
+```
+if (exist url)
+    if(method correct) sucess!
+    else 405 method not allowed
+else 404 not found
+```
+> 현재 방식으로 이 로직을 처리하면, map으로 찾은 후 method를 확인하기 위해 다시 전체를 뒤져야하기에 비효율적일 것이다.
+> url로 메서드와 컨트롤러를 찾아주는 방식이 좀 더 이 예외처리 로직을 담기에 적합해보인다. -> map<url,map<method,controller>> 
+> 
+> 그러나 다시 생각해보니, url 존재 안하면 바로 405 반환이 아니라 정적리소스 찾으러 가야하기에.. 어차피 깔끔한 로직이 아닌 것 같아 그냥 직관적인
+현재 구조로 가기로 했다. 
+> url이 존재는 하는지 판단하는 메서드 추가 
