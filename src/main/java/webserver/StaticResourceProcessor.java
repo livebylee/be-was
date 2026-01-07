@@ -21,36 +21,27 @@ public class StaticResourceProcessor {
     }
 
     public void process(String path, HttpResponse response) {
-        int dotIndex = path.lastIndexOf(".");
-        if (dotIndex == -1 && !path.endsWith("/")) {
+        if (path.lastIndexOf(".") == -1 && !path.endsWith("/")) {
             response.response302Header(path + "/");
             return;
         }
-
-        if (path.endsWith("/")) {
-            path += "/index.html";
-        }
-
-        String extension = "html";
-        dotIndex = path.lastIndexOf(".");
-        if (dotIndex != -1) {
-            extension = path.substring(dotIndex + 1);
-        }
+        String normalizedPath = path.endsWith("/") ? path + "index.html" : path;
+        String extension = extractExtension(normalizedPath);
         String contentType = MimeType.getContentType(extension);
 
-        String resourcePath = "/static" + path;
+        String resourcePath = "/static" + normalizedPath;
+
         try (InputStream resourceStream = getClass().getResourceAsStream(resourcePath)) {
-            if (resourceStream == null) {
-                response.response404Header();
-                return;
-            }
             byte[] body = util.IOUtils.readAllBytes(resourceStream);
             response.response200Header(body.length, contentType);
             response.responseBody(body);
-
         } catch (IOException e) {
             logger.error("file read error");
         }
     }
 
+    private String extractExtension(String path) {
+        int dotIndex = path.lastIndexOf(".");
+        return (dotIndex != -1) ? path.substring(dotIndex + 1) : "html";
+    }
 }
