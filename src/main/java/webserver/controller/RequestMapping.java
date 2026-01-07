@@ -19,7 +19,7 @@ public class RequestMapping {
         return handlerMap.get(new MethodUrlKey(method, url));
     }
 
-    public static boolean existUrl(String url) {
+    public static boolean isExistUrl(String url) {
         return handlerMap.keySet().stream().anyMatch(key -> key.url().equals(url));
     }
 }
