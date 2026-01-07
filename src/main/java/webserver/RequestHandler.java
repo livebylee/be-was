@@ -44,7 +44,11 @@ public class RequestHandler implements Runnable {
                 } else if (RequestMapping.existUrl(path)) {  //url 있는데 메소드 다름
                     //response.response405; //추후 구현
                 } else {
-                    processor.process(path, response);
+                    if(processor.existFile(path)){
+                        processor.process(path);
+                    }else{
+                        //response.response404
+                    }
                 }
             } catch (IllegalArgumentException e) {
                 logger.error("Bad Request: {}", e.getMessage());

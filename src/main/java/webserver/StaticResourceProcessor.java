@@ -11,6 +11,15 @@ import java.io.InputStream;
 public class StaticResourceProcessor {
     private static final Logger logger = LoggerFactory.getLogger(StaticResourceProcessor.class);
 
+    public boolean isExist(String path) {
+        String resourcePath = "/static" + (path.endsWith("/") ? path + "index.html" : path);
+        try (InputStream is = getClass().getResourceAsStream(resourcePath)) {
+            return is != null;
+        } catch (IOException e) {
+            return false;
+        }
+    }
+
     public void process(String path, HttpResponse response) {
         int dotIndex = path.lastIndexOf(".");
         if (dotIndex == -1 && !path.endsWith("/")) {
@@ -43,4 +52,5 @@ public class StaticResourceProcessor {
             logger.error("file read error");
         }
     }
+
 }
