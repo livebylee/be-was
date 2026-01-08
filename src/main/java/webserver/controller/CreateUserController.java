@@ -25,6 +25,6 @@ public class CreateUserController implements Controller {
         logger.debug("New User created : {}", user);
         Database.addUser(user);
 
-        response.response302Header("/index.html");
+        response.sendRedirect("/index.html");
     }
 }
