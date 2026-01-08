@@ -137,3 +137,6 @@ else 404 not found
 > and initiates a new GET request to that address
 > without any additional logcic.
 
+> ### HttpResponse Refactoring
+> 
+> 상태코드별로 메서드가 전부 있는게 매우 비효율적인 것 같아 상태코드와 메시지를 묶어 관리하도록 리팩토링하였다.
