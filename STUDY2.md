@@ -128,3 +128,12 @@ else 404 not found
 > ### enum 내에서 NONE 처리까지 해주는게 맞을까?
 > 
 > Null Object Pattern...
+
+
+> ### why does redirection work automatically
+>
+> When the browser identifies a 302 code,
+> it reads the address from the Location header 
+> and initiates a new GET request to that address
+> without any additional logcic.
+
