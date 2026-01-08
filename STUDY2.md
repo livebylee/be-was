@@ -96,3 +96,10 @@ else 404 not found
 > 
 > 해당 부분에서 어느 메서드가 405,404를 반환해야하는지 고민이 있었다.
 
+
+
+> ### HTTP Body ?
+>
+> - POST PUT PATCH : 보통 body가 포함
+> - Content-Length, Transfer-Encoding 헤더 보고 판단
+> - Empty Line(CRLF) 로 구성된 빈 줄로 header와 body를 구분한다
