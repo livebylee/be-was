@@ -107,3 +107,24 @@ else 404 not found
 
 > ### HTTP parsing logic
 > http request의 구조대로, requestline , header,body의 파서가 각각 존재하는게 좋다고 생각이 들어 그렇게 리팩토링했다.
+
+
+> ### enum 내에서 조회 메서드의 효율성?
+>
+> 1. 기존 방식 
+> from(String value) 메서드가 values()를 호출해 순회하는 식으로 구현되는 것 같아 그렇게 구현했다. (O(n))
+> 그러나 enum 상수가 많아지는 상황을 고려하면 비효율적이다. 또한 values()는 copy본을 계속 생성해 메모리 오버헤드가 있을 수 있다는 생각이 들었다.
+> (사실 지금 코드에서 enum상수가 많아질 일은 없다는 걸 알지만..)
+
+> 2. 내 생각
+> map으로 조희하면 O(1) 일텐데.. map이 낫지 않나? enum 내부에서 map을 또 쓰는건 어떤가?
+>
+> 3. 개선 방식
+> Enum 내부에 static Map을 선언하고, 클래스 로딩 시점에 상수들을 미리 매핑해두는 방식 사용 
+> from에서 map 사용 O(1)으로 조회 가능!
+>
+> +) 찾아보다가 `EnumMap` 을 발견했다. enum을 키로 데이터를 관리할때는 이걸 써보자..
+
+> ### enum 내에서 NONE 처리까지 해주는게 맞을까?
+> 
+> Null Object Pattern...
