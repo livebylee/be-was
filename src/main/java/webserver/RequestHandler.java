@@ -7,6 +7,7 @@ import http.HttpMethod;
 import http.HttpRequest;
 import http.HttpResponse;
 
+import http.HttpStatus;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import webserver.controller.Controller;
@@ -46,14 +47,14 @@ public class RequestHandler implements Runnable {
                 } else if (processor.isExistPath(path)) {
                     processor.process(path, response);
                 } else {
-                    response.response404Header();
+                    response.sendError(HttpStatus.NOT_FOUND, " 404 error");
                 }
             } catch (IllegalArgumentException e) {
                 logger.error("Bad Request: {}", e.getMessage());
-                //response.response400Header();
+                response.sendError(HttpStatus.BAD_REQUEST, "400 error");
             } catch (Exception e) {
                 logger.error("Internal Server Error: ", e);
-                //response.response500Header;
+                response.sendError(HttpStatus.INTERNAL_SERVER_ERROR, "500 error");
             }
         } catch (IOException e) {
             logger.error(e.getMessage());
