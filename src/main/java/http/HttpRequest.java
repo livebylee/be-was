@@ -98,10 +98,20 @@ public class HttpRequest {
     }
 
     private void parseBody(BufferedReader br) throws IOException {
-        String contentType = headers.get("Content-Type");
         int contentLength = Integer.parseInt(headers.get("Content-Length"));
 
-        byte[] bodyBytes = readBodyBytes(in, contentLength);  ///바디 읽기
+        // 텍스트 데이터 기준 ( byte 방식으로 변환 필요)
+        char[] bodyChars = new char[contentLength];
+        int readCount = 0;
+        while(readCount < contentLength){
+            int result = br.read(bodyChars,readCount,contentLength-readCount);
+            if(result == -1) break;
+            readCount += result;
+        }
+        String body = new String(bodyChars , 0, readCount);
+
+        contentType = headers.get("Content-Type");
+
         if (contentType.contains("")) {
             // 타입별 파싱 함수
         }
