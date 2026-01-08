@@ -103,17 +103,24 @@ public class HttpRequest {
         // 텍스트 데이터 기준 ( byte 방식으로 변환 필요)
         char[] bodyChars = new char[contentLength];
         int readCount = 0;
-        while(readCount < contentLength){
-            int result = br.read(bodyChars,readCount,contentLength-readCount);
-            if(result == -1) break;
+        while (readCount < contentLength) {
+            int result = br.read(bodyChars, readCount, contentLength - readCount);
+            if (result == -1) break;
             readCount += result;
         }
-        String body = new String(bodyChars , 0, readCount);
+        String body = new String(bodyChars, 0, readCount);
 
-        contentType = headers.get("Content-Type");
+        ContentType contentType = ContentType.from("Content-Type");
 
-        if (contentType.contains("")) {
-            // 타입별 파싱 함수
+        switch (contentType) {
+            case FORM_URLENCODED:
+                parseQueryString(body);
+                HttpRequest.logger.debug("Body Params (Form) : {}", params);
+                break;
+
+            default:
+                HttpRequest.logger.warn("지원하지 않는 컨텐츠타입 : {}",contentType);
+                throw  new IllegalArgumentException("Unsupported Content-Type: " + contentType);
         }
     }
 
