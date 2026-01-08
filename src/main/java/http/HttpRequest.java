@@ -29,27 +29,15 @@ public class HttpRequest {
     public HttpRequest(InputStream in) {
         try {
             BufferedReader br = new BufferedReader(new InputStreamReader(in, StandardCharsets.UTF_8));
+
             String line = br.readLine();
             if (line == null) return;
+
             parseRequestLine(line);
+            parseHeaders(br);
 
-            while ((line = br.readLine()) != null && !line.equals("")) {
-                String[] headerTokens = line.split(":");
-                if (headerTokens.length >= 2) {
-                    String key = headerTokens[0].trim();
-                    String value = line.substring(line.indexOf(":") + 1).trim();
-                    headers.put(key, value);
-                }
-                HttpRequest.logger.debug("Header: {}", line);
-            }
-
-            if (method == HttpMethod.POST) {
-                String length = headers.get("Content-Length");
-                if (length != null) {
-                    int contentLength = Integer.parseInt(length);
-                    String body = IOUtils.readData(br, contentLength);
-                    this.params.putAll(HttpRequestUtils.parseQueryString(body));
-                }
+            if (headers.containsKey("Content-Length") && headers.get("Content-Length") != null) {
+                parseBody(br);
             }
 
 
@@ -93,6 +81,29 @@ public class HttpRequest {
                 String value = URLDecoder.decode(tokens[1], StandardCharsets.UTF_8);
                 params.put(key, value);
             }
+        }
+    }
+
+    private void parseHeaders(BufferedReader br) throws IOException {
+        String line;
+        while ((line = br.readLine()) != null && !line.isEmpty()) {
+            String[] headerTokens = line.split(":");
+            if (headerTokens.length >= 2) {
+                String key = headerTokens[0].trim();
+                String value = line.substring(line.indexOf(":") + 1).trim();
+                headers.put(key, value);
+            }
+            HttpRequest.logger.debug("Header: {}", line);
+        }
+    }
+
+    private void parseBody(BufferedReader br) throws IOException {
+        String contentType = headers.get("Content-Type");
+        int contentLength = Integer.parseInt(headers.get("Content-Length"));
+
+        byte[] bodyBytes = readBodyBytes(in, contentLength);  ///바디 읽기
+        if (contentType.contains("")) {
+            // 타입별 파싱 함수
         }
     }
 
