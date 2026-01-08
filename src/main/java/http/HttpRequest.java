@@ -110,7 +110,7 @@ public class HttpRequest {
         }
         String body = new String(bodyChars, 0, readCount);
 
-        ContentType contentType = ContentType.from("Content-Type");
+        ContentType contentType = ContentType.from(headers.get("Content-Type"));
 
         switch (contentType) {
             case FORM_URLENCODED:
@@ -119,8 +119,8 @@ public class HttpRequest {
                 break;
 
             default:
-                HttpRequest.logger.warn("지원하지 않는 컨텐츠타입 : {}",contentType);
-                throw  new IllegalArgumentException("Unsupported Content-Type: " + contentType);
+                HttpRequest.logger.warn("지원하지 않는 컨텐츠타입 : {}", contentType);
+                throw new IllegalArgumentException("Unsupported Content-Type: " + contentType);
         }
     }
 
