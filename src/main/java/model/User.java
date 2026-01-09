@@ -10,8 +10,11 @@ public class User {
         if (userId == null || userId.trim().isEmpty()) {
             throw new IllegalArgumentException("회원가입을 위해 1자 이상의 아이디가 필요합니다");
         }
-        this.userId = userId;
-        this.password = password;
+        if (password == null || password.trim().isEmpty()) {
+            throw new IllegalArgumentException("비밀번호는 1자 이상이어야 합니다");
+        }
+        this.userId = userId.trim();
+        this.password = password.trim();
         this.name = name;
         this.email = email;
     }
