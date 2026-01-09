@@ -13,7 +13,7 @@ public class RequestMapping {
 
     static {
         handlerMap.put(new MethodUrlKey(HttpMethod.POST, "/user/create"), new CreateUserController());
-        handlerMap.put(new MethodUrlKey(HttpMethod.GET)"user/login", new LoginUserController());
+        handlerMap.put(new MethodUrlKey(HttpMethod.POST, "user/login"), new LoginUserController());
     }
 
     public static Controller getController(HttpMethod method, String url) {
