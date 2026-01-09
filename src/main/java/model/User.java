@@ -36,4 +36,11 @@ public class User {
     public String toString() {
         return "User [userId=" + userId + ", password=" + password + ", name=" + name + ", email=" + email + "]";
     }
+
+    public boolean authenticate(String password) {
+        if (password == null) {
+            return false;
+        }
+        return this.password.equals(password.trim());
+    }
 }

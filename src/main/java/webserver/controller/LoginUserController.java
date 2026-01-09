@@ -15,6 +15,10 @@ public class LoginUserController implements Controller {
         String password = request.getParams("password");
 
         User user = Database.findUserById(userId);
+
+        if (user != null && user.authenticate(password)) {
+
+        }
     }
 
 }
