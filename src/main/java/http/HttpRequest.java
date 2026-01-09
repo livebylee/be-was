@@ -132,6 +132,10 @@ public class HttpRequest {
         return this.params;
     }
 
+    public String getParams(String key){
+        return this.params.get(key);
+    }
+
     public HttpMethod getMethod() {
         return this.method;
     }
