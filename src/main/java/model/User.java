@@ -10,6 +10,10 @@ public class User {
         if (userId == null || userId.trim().isEmpty()) {
             throw new IllegalArgumentException("회원가입을 위해 1자 이상의 아이디가 필요합니다");
         }
+        validate(userId, "userId");
+        validate(password, "password");
+        validate(name, "name");
+
         this.userId = userId;
         this.password = password;
         this.name = name;
@@ -35,5 +39,11 @@ public class User {
     @Override
     public String toString() {
         return "User [userId=" + userId + ", password=" + password + ", name=" + name + ", email=" + email + "]";
+    }
+
+    private void validate(String value, String fieldName) {
+        if (value == null || value.trim().isEmpty()) {
+            throw new IllegalArgumentException(fieldName + "값이 비어있습니다");
+        }
     }
 }
