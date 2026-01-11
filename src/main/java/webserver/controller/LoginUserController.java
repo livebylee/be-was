@@ -20,9 +20,11 @@ public class LoginUserController implements Controller {
 
         if (user != null && user.authenticate(password)) {
             String sessionId = UUID.randomUUID().toString();
-            //세션 저장소에 저장
-            //응답 생성
-            //리다이렉트
+            // 세션 저장
+            Database.addUser(user);
+
+            response.addHeader("Set-Cookie", "sid=" + sessionId + "; Path=/");
+            response.sendRedirect("/index.html");
         } else {
             //로그인 실패 알림 띄우기
         }

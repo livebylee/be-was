@@ -15,10 +15,10 @@ import java.util.HashMap;
 import java.util.Map;
 
 import static http.HttpMethod.from;
-
+l
 
 public class HttpRequest {
-    private static final Logger logger = LoggerFactory.getLogger(HttpResponse.class);
+    private static final Logger logger = LoggerFactory.getLogger(HttpRequest.class);
 
     private HttpMethod method;
     private String path;
