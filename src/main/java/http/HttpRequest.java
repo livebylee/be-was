@@ -15,13 +15,14 @@ import java.util.HashMap;
 import java.util.Map;
 
 import static http.HttpMethod.from;
-l
+
 
 public class HttpRequest {
     private static final Logger logger = LoggerFactory.getLogger(HttpRequest.class);
 
     private HttpMethod method;
     private String path;
+    private String queryString;
     private Map<String, String> headers = new HashMap<>();
     private Map<String, String> params = new HashMap<>();
 
@@ -63,10 +64,12 @@ public class HttpRequest {
         int qindex = url.lastIndexOf("?");
         if (qindex == -1) {
             this.path = url;
+            this.queryString = null;
             return;
         }
         this.path = url.substring(0, qindex);
-        parseQueryString(url.substring(qindex + 1));
+        this.queryString = url.substring(qindex + 1);
+        parseQueryString(this.queryString);
     }
 
     private void parseQueryString(String queryString) {
@@ -128,11 +131,15 @@ public class HttpRequest {
         return this.path;
     }
 
+    public String getQueryString() {
+        return this.queryString;
+    }
+
     public Map<String, String> getParams() {
         return this.params;
     }
 
-    public String getParams(String key){
+    public String getParams(String key) {
         return this.params.get(key);
     }
 

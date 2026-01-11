@@ -10,7 +10,7 @@ import org.slf4j.LoggerFactory;
 import java.util.UUID;
 
 public class LoginUserController implements Controller {
-    private static final Logger logger = LoggerFactory.getLogger(CreateUserController.class);
+    private static final Logger logger = LoggerFactory.getLogger(LoginUserController.class);
 
     public void process(HttpRequest request, HttpResponse response) {
         String userId = request.getParams("userId");
@@ -20,14 +20,14 @@ public class LoginUserController implements Controller {
 
         if (user != null && user.authenticate(password)) {
             String sessionId = UUID.randomUUID().toString();
-            // 세션 저장
-            Database.addUser(user);
+
+            Database.addSession(sessionId, user);
 
             response.addHeader("Set-Cookie", "sid=" + sessionId + "; Path=/");
             response.sendRedirect("/index.html");
         } else {
-            //로그인 실패 알림 띄우기
+            logger.debug("login failed : wrong password or id for user'{}'.", userId);
+            response.sendRedirect("/login/login_fail.html");
         }
     }
-
 }

@@ -45,7 +45,7 @@ public class RequestHandler implements Runnable {
                 } else if (RequestMapping.isExistUrl(path)) {  //url 있는데 메소드 틀림
                     //response.response405; //추후 구현
                 } else if (processor.isExistPath(path)) {
-                    processor.process(path, response);
+                    processor.process(request, response);
                 } else {
                     response.sendError(HttpStatus.NOT_FOUND, " 404 error");
                 }

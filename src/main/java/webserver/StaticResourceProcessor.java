@@ -1,6 +1,7 @@
 package webserver;
 
 import http.ContentType;
+import http.HttpRequest;
 import http.HttpResponse;
 import http.HttpStatus;
 import http.MimeType;
@@ -22,9 +23,16 @@ public class StaticResourceProcessor {
         }
     }
 
-    public void process(String path, HttpResponse response) {
+    public void process(HttpRequest request, HttpResponse response) {
+        String path = request.getPath();
+        String queryString = request.getQueryString();
+
         if (path.lastIndexOf(".") == -1 && !path.endsWith("/")) {
-            response.sendRedirect(path + "/");
+            String redirectPath = path + "/";
+            if (queryString != null) {
+                redirectPath += "?" + queryString;
+            }
+            response.sendRedirect(redirectPath);
             return;
         }
         String normalizedPath = path.endsWith("/") ? path + "index.html" : path;

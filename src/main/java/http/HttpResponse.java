@@ -13,7 +13,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class HttpResponse {
-    private static final Logger logger = LoggerFactory.getLogger(RequestHandler.class);
+    private static final Logger logger = LoggerFactory.getLogger(HttpResponse.class);
     private DataOutputStream dos;
 
     private HttpStatus status = HttpStatus.OK;
@@ -65,6 +65,8 @@ public class HttpResponse {
 
     public void sendRedirect(HttpStatus status, String url) {
         this.status = status;
+        this.headers.clear();
+        this.body = new byte[0];
         this.addHeader("Location", url);
         this.send();
     }
