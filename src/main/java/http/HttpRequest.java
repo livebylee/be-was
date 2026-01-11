@@ -25,6 +25,7 @@ public class HttpRequest {
     private String queryString;
     private Map<String, String> headers = new HashMap<>();
     private Map<String, String> params = new HashMap<>();
+    private Map<String, String> cookies = new HashMap<>();
 
 
     public HttpRequest(InputStream in) {
@@ -95,9 +96,31 @@ public class HttpRequest {
                 String key = headerTokens[0].trim();
                 String value = line.substring(line.indexOf(":") + 1).trim();
                 headers.put(key, value);
+
+                // Cookie 헤더 파싱
+                if ("Cookie".equalsIgnoreCase(key)) {
+                    parseCookies(value);
+                }
             }
             HttpRequest.logger.debug("Header: {}", line);
         }
+    }
+
+    private void parseCookies(String cookieHeader) {
+        if (cookieHeader == null || cookieHeader.isEmpty()) {
+            return;
+        }
+        // Cookie 헤더 형식: "sid=abc123; name=value; ..."
+        String[] cookiePairs = cookieHeader.split(";");
+        for (String cookiePair : cookiePairs) {
+            String[] tokens = cookiePair.trim().split("=", 2);
+            if (tokens.length == 2) {
+                String key = tokens[0].trim();
+                String value = tokens[1].trim();
+                cookies.put(key, value);
+            }
+        }
+        logger.debug("Cookies: {}", cookies);
     }
 
     private void parseBody(BufferedReader br) throws IOException {
@@ -145,5 +168,13 @@ public class HttpRequest {
 
     public HttpMethod getMethod() {
         return this.method;
+    }
+
+    public Map<String, String> getCookies() {
+        return this.cookies;
+    }
+
+    public String getCookie(String key) {
+        return this.cookies.get(key);
     }
 }
