@@ -12,10 +12,15 @@ public class AuthChecker {
 
     private static final Logger logger = LoggerFactory.getLogger(AuthChecker.class);
     private static final Set<String> protectedPaths = Set.of("/mypage");
+    private static final Set<String> guestOnlyPaths = Set.of("/login", "/registration");
 
     // 인증이 필요한 경로인지 확인
     public static boolean isProtectedPath(String path) {
         return protectedPaths.contains(path);
+    }
+
+    public static boolean isGuestOnlyPath(String path) {
+        return guestOnlyPaths.contains(path);
     }
 
     // 로그인 상태 확인
@@ -31,6 +36,14 @@ public class AuthChecker {
             if (!isLoggedIn(request)) {
                 logger.debug("로그인하지 않은 사용자의 허용되지 않은 경로 접근 :{}", path);
                 response.sendRedirect("/login");
+                return true;
+            }
+        }
+
+        if (isGuestOnlyPath(path)) {
+            if (isLoggedIn(request)) {
+                logger.debug("로그인한 사용자의 게스트 전용 경로 접근 :{} ", path);
+                response.sendRedirect("/index.html");
                 return true;
             }
         }
