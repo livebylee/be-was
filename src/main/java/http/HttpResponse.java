@@ -82,4 +82,12 @@ public class HttpResponse {
         this.setBody(message.getBytes(StandardCharsets.UTF_8));
         this.send();
     }
+
+    public void sendBody(String content, ContentType contentType) {
+        byte[] bodyBytes = content.getBytes(StandardCharsets.UTF_8);
+        this.status = HttpStatus.OK;
+        this.addHeader("Content-Type", contentType.getValue() + ";charset=utf-8");
+        this.setBody(bodyBytes);
+        this.send();
+    }
 }
