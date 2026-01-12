@@ -139,14 +139,14 @@ public class HttpRequest {
         ContentType contentType = ContentType.from(headers.get("Content-Type"));
 
         switch (contentType) {
-            case FORM_URLENCODED:
+            case FORM_URLENCODED -> {
                 parseQueryString(body);
                 HttpRequest.logger.debug("Body Params (Form) : {}", params);
-                break;
-
-            default:
+            }
+            default -> {
                 HttpRequest.logger.warn("지원하지 않는 컨텐츠타입 : {}", contentType);
                 throw new IllegalArgumentException("Unsupported Content-Type: " + contentType);
+            }
         }
     }
 
