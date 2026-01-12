@@ -22,8 +22,6 @@ public class RequestHandler implements Runnable {
     private Socket connection;
     private static final StaticResourceProcessor processor = new StaticResourceProcessor();
 
-    private static final Set<String> protectedPaths = Set.of("/mypage");
-
     public RequestHandler(Socket connectionSocket) {
         this.connection = connectionSocket;
     }
@@ -42,12 +40,8 @@ public class RequestHandler implements Runnable {
                 HttpRequest request = new HttpRequest(in);
                 String path = request.getPath();
 
-                if (isProtectedPath(path)) {
-                    if (!isLoggedIn(request)) {
-                        logger.debug("로그인하지 않은 사용자의 허용되지 않은 경로 접근 :{}", path);
-                        response.sendRedirect("/login");
-                        return;
-                    }
+                if (AuthChecker.checkAuthentication(request, response)) {
+                    return;
                 }
 
                 HttpMethod method = request.getMethod();
@@ -72,14 +66,5 @@ public class RequestHandler implements Runnable {
         } catch (IOException e) {
             logger.error(e.getMessage());
         }
-    }
-
-    private boolean isProtectedPath(String path) {
-        return protectedPaths.contains(path);
-    }
-
-    private boolean isLoggedIn(HttpRequest request) {
-        String sid = request.getCookie("sid");
-        return sid != null && Database.getUserBySessionId(sid) != null;
     }
 }
