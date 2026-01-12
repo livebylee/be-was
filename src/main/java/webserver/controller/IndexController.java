@@ -1,6 +1,7 @@
 package webserver.controller;
 
 import db.Database;
+import http.ContentType;
 import http.HttpRequest;
 import http.HttpResponse;
 import model.User;
@@ -23,15 +24,28 @@ public class IndexController implements Controller {
         StringBuilder authHtml = new StringBuilder();
 
         if (user != null) {
-            authHtml.append("<li><a href='/mypage'>").append(user.getName()).append("</a></li>");
-            authHtml.append("<li><a href='/user/logout' role='button'>로그아웃</a></li>");
-            //authHtml.append()
+            // 1. 로그인 상태: 사용자 이름(마이페이지 연결) + 로그아웃 버튼
+            authHtml.append("<li class=\"header__menu__item\">");
+            authHtml.append("  <a class=\"btn btn_ghost btn_size_s\" href=\"/mypage\">")
+                    .append(user.getName()).append(" 님</a>");
+            authHtml.append("</li>");
+
+            authHtml.append("<li class=\"header__menu__item\">");
+            authHtml.append("  <a class=\"btn btn_contained btn_size_s\" href=\"/logout\">로그아웃</a>");
+            authHtml.append("</li>");
         } else {
-            authHtml.append("<li><a href='/user/login.html' role='button'>로그인</a></li>");
-            authHtml.append("<li><a href='/user/form.html' role='button'>회원가입</a></li>");
+            // 2. 비로그인 상태: 기존 HTML의 로그인/회원가입 버튼 구조 유지
+            authHtml.append("<li class=\"header__menu__item\">");
+            authHtml.append("  <a class=\"btn btn_contained btn_size_s\" href=\"/login\">로그인</a>");
+            authHtml.append("</li>");
+
+            authHtml.append("<li class=\"header__menu__item\">");
+            authHtml.append("  <a class=\"btn btn_ghost btn_size_s\" href=\"/registration\">회원 가입</a>");
+            authHtml.append("</li>");
         }
+
         String dynamicHtml = html.replace("{{LOGIN_SECTION}}", authHtml.toString());
-        //response.sendBody(dynamicHtml , "text/html"); // 바뀐 내용 전달
+        response.sendBody(dynamicHtml, ContentType.HTML); // 바뀐 내용 전달
     }
 
 

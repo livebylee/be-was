@@ -65,7 +65,6 @@ public class HttpResponse {
 
     public void sendRedirect(HttpStatus status, String url) {
         this.status = status;
-        this.headers.clear();
         this.body = new byte[0];
         this.addHeader("Location", url);
         this.send();
