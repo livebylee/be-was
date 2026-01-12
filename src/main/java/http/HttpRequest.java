@@ -36,9 +36,11 @@ public class HttpRequest {
             if (line == null) return;
 
             parseRequestLine(line);
+            logger.debug("Method:{}, path :{} ", method, path);
             parseHeaders(br);
 
             if (headers.containsKey("Content-Length") && headers.get("Content-Length") != null) {
+                logger.debug("Content-Length: {}, Content-Type: {}", headers.get("Content-Length"), headers.get("contentType"));
                 parseBody(br);
             }
 

@@ -15,19 +15,23 @@ public class IndexController implements Controller {
 
 
     public void process(HttpRequest request, HttpResponse response) {
-        String filePath = "./index.html";
-        String html = readFile(filePath);
+        String html = readFile("/index.html");
 
         String sid = request.getCookie("sid");
         User user = Database.getUserBySessionId(sid);
-        Map<String, String> params = request.getParams();
 
-        StringBuilder sb = new StringBuilder(html);
+        StringBuilder authHtml = new StringBuilder();
 
         if (user != null) {
-            // 로그인 버튼 교체
+            authHtml.append("<li><a href='/mypage'>").append(user.getName()).append("</a></li>");
+            authHtml.append("<li><a href='/user/logout' role='button'>로그아웃</a></li>");
+            //authHtml.append()
+        } else {
+            authHtml.append("<li><a href='/user/login.html' role='button'>로그인</a></li>");
+            authHtml.append("<li><a href='/user/form.html' role='button'>회원가입</a></li>");
         }
-        // 응답 전송
+        String dynamicHtml = html.replace("{{LOGIN_SECTION}}", authHtml.toString());
+        //response.sendBody(dynamicHtml , "text/html"); // 바뀐 내용 전달
     }
 
 
