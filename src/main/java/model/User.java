@@ -7,6 +7,9 @@ public class User {
     private String email;
 
     public User(String userId, String password, String name, String email) {
+        if (userId == null || userId.trim().isEmpty()) {
+            throw new IllegalArgumentException("회원가입을 위해 1자 이상의 아이디가 필요합니다");
+        }
         this.userId = userId;
         this.password = password;
         this.name = name;
