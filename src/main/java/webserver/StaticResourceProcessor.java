@@ -43,5 +43,4 @@ public class StaticResourceProcessor {
             logger.error("file read error");
         }
     }
-
 }

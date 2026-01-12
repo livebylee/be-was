@@ -1,19 +1,19 @@
-package model;
-
-import http.HttpRequest;
-import http.HttpResponse;
+package webserver.controller;
 
 import db.Database;
+import http.HttpRequest;
+import http.HttpResponse;
+import model.User;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.Map;
 
-public class UserHandler {
-    private static final Logger logger = LoggerFactory.getLogger(UserHandler.class);
+public class CreateUserController implements Controller {
+    private static final Logger logger = LoggerFactory.getLogger(CreateUserController.class);
 
-    public void createUser(HttpRequest request, HttpResponse response) {
 
+    public void process(HttpRequest request, HttpResponse response) {
         Map<String, String> params = request.getParams();
         User user = new User(
                 params.get("userId"),
