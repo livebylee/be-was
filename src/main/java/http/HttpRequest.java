@@ -39,8 +39,8 @@ public class HttpRequest {
             logger.debug("Method:{}, path :{} ", method, path);
             parseHeaders(br);
 
-            if (headers.containsKey("Content-Length") && headers.get("Content-Length") != null) {
-                logger.debug("Content-Length: {}, Content-Type: {}", headers.get("Content-Length"), headers.get("contentType"));
+            if (headers.containsKey("content-length") && headers.get("content-length") != null) {
+                logger.debug("Content-Length: {}, Content-Type: {}", headers.get("content-length"), headers.get("content-type"));
                 parseBody(br);
             }
 
@@ -95,7 +95,7 @@ public class HttpRequest {
         while ((line = br.readLine()) != null && !line.isEmpty()) {
             String[] headerTokens = line.split(":");
             if (headerTokens.length >= 2) {
-                String key = headerTokens[0].trim();
+                String key = headerTokens[0].trim().toLowerCase();
                 String value = line.substring(line.indexOf(":") + 1).trim();
                 headers.put(key, value);
 
@@ -126,7 +126,7 @@ public class HttpRequest {
     }
 
     private void parseBody(BufferedReader br) throws IOException {
-        int contentLength = Integer.parseInt(headers.get("Content-Length"));
+        int contentLength = Integer.parseInt(headers.get("content-length"));
 
         // 텍스트 데이터 기준 ( byte 방식으로 변환 필요)
         char[] bodyChars = new char[contentLength];
@@ -138,7 +138,7 @@ public class HttpRequest {
         }
         String body = new String(bodyChars, 0, readCount);
 
-        ContentType contentType = ContentType.from(headers.get("Content-Type"));
+        ContentType contentType = ContentType.from(headers.get("content-type"));
 
         switch (contentType) {
             case FORM_URLENCODED -> {
