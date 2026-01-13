@@ -81,11 +81,13 @@ public class HttpRequest {
         }
         String[] pairs = queryString.split("&");
         for (String pair : pairs) {
-            String[] tokens = pair.split("=");
-            if (tokens.length == 2) {
-                String key = tokens[0];
-                String value = URLDecoder.decode(tokens[1], StandardCharsets.UTF_8);
-                params.put(key, value);
+            int index = pair.indexOf("=");
+            if (index > 0) {
+                String key = pair.substring(0, index);
+                String value = pair.substring(index + 1);
+                params.put(key, URLDecoder.decode(value, StandardCharsets.UTF_8));
+            } else if (!pair.isEmpty()) {
+                params.put(pair, "");
             }
         }
     }
