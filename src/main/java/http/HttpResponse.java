@@ -63,6 +63,13 @@ public class HttpResponse {
         this.send();
     }
 
+    public void forwardWithContentType(byte[] body, String contentType) {
+        this.status = HttpStatus.OK;
+        this.addHeader("Content-Type", contentType);
+        this.setBody(body);
+        this.send();
+    }
+
     public void sendRedirect(HttpStatus status, String url) {
         this.status = status;
         this.body = new byte[0];

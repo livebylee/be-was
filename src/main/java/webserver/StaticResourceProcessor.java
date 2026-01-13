@@ -37,7 +37,7 @@ public class StaticResourceProcessor {
         }
         String normalizedPath = path.endsWith("/") ? path + "index.html" : path;
         String extension = extractExtension(normalizedPath);
-        ContentType contentType = ContentType.from(extension);
+        String contentTypeValue = MimeType.getContentType(extension);
 
         String resourcePath = "/static" + normalizedPath;
 
@@ -47,7 +47,7 @@ public class StaticResourceProcessor {
                 return;
             }
             byte[] body = util.IOUtils.readAllBytes(resourceStream);
-            response.forward(body, contentType);
+            response.forwardWithContentType(body, contentTypeValue);
         } catch (IOException e) {
             logger.error("file read error");
         }
