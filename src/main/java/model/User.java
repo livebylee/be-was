@@ -7,12 +7,10 @@ public class User {
     private String email;
 
     public User(String userId, String password, String name, String email) {
-        // 1. 검증 (실패 시 예외 발생으로 객체 생성을 막음)
-        validate(userId, "아이디를 입력해주세요.");
-        validate(password, "비밀번호를 입력해주세요.");
-        validate(name, "이름을 입력해주세요.");
+        validate(userId, "아이디를 4자 이상 입력해주세요.");
+        validate(password, "비밀번호를 4자 이상 입력해주세요.");
+        validate(name, "이름을 4자 이상 입력해주세요.");
 
-        // 2. 데이터 정제 및 할당 (trim으로 공백 제거)
         this.userId = userId.trim();
         this.password = password.trim();
         this.name = name;
@@ -41,7 +39,7 @@ public class User {
     }
 
     private void validate(String value, String errorMessage) {
-        if (value == null || value.trim().isEmpty()) {
+        if (value == null || value.trim().length() < 4) {
             throw new IllegalArgumentException(errorMessage);
         }
     }

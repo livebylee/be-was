@@ -13,7 +13,7 @@ class UserTest {
     @BeforeEach
     void setUp() {
         // 테스트마다 공통으로 사용할 유저 객체를 미리 생성합니다.
-        user = new User("123", "pw123", "lee", "test@gmail.com");
+        user = new User("user123", "pw123", "name123", "test@gmail.com");
     }
 
     @Test
@@ -30,6 +30,27 @@ class UserTest {
         assertThatThrownBy(() -> {
             new User("", "password", "name", "email");
         }).isInstanceOf(IllegalArgumentException.class);
+    }
+
+    @Test
+    @DisplayName("아이디가 4글자 미만이면 예외가 발생한다")
+    void idLengthTest() {
+        assertThatThrownBy(() -> new User("abc", "password", "nickname", "test@test.com"))
+                .isInstanceOf(IllegalArgumentException.class);
+    }
+
+    @Test
+    @DisplayName("비밀번호가 4글자 미만이면 예외가 발생한다")
+    void passwordLengthTest() {
+        assertThatThrownBy(() -> new User("user123", "123", "nickname", "test@test.com"))
+                .isInstanceOf(IllegalArgumentException.class);
+    }
+
+    @Test
+    @DisplayName("닉네임이 4글자 미만이면 예외가 발생한다")
+    void nicknameLengthTest() {
+        assertThatThrownBy(() -> new User("user123", "password", "lee", "test@test.com"))
+                .isInstanceOf(IllegalArgumentException.class);
     }
 
     // --- 로그인(인증) 관련 테스트 추가 ---
