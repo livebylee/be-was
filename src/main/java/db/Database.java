@@ -18,10 +18,16 @@ public class Database {
         return users.get(userId);
     }
 
+    public static User findUserByName(String name) {
+        return users.values().stream()
+                .filter(user -> user.getName().equals(name))
+                .findFirst()
+                .orElse(null);
+    }
+
     public static Collection<User> findAll() {
         return users.values();
     }
-
 
     public static void addSession(String sessionId, User user) {
         sessions.put(sessionId, user);
