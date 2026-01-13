@@ -20,10 +20,11 @@ public class RequestHandler implements Runnable {
     private static final Logger logger = LoggerFactory.getLogger(RequestHandler.class);
 
     private Socket connection;
-    private static final StaticResourceProcessor processor = new StaticResourceProcessor();
+    private final StaticResourceProcessor processor;
 
-    public RequestHandler(Socket connectionSocket) {
+    public RequestHandler(Socket connectionSocket, StaticResourceProcessor staticResourceProcessor) {
         this.connection = connectionSocket;
+        this.processor = staticResourceProcessor;
     }
 
     public void run() {

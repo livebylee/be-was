@@ -29,6 +29,8 @@ public class WebServer {
 
         ExecutorService executorService = Executors.newFixedThreadPool(threadpool_size);
 
+        StaticResourceProcessor staticResourceProcessor = new StaticResourceProcessor();
+
         try (ServerSocket listenSocket = new ServerSocket(port)) {
             logger.info("Web Application Server started {} port.", port);
 
@@ -38,7 +40,7 @@ public class WebServer {
             while (true) {
                 connection = listenSocket.accept();
                 try {
-                    executorService.execute(new RequestHandler(connection));
+                    executorService.execute(new RequestHandler(connection, staticResourceProcessor));
                 } catch (Exception e) {
                     logger.error("failed to execute request handler, closing connection", e);
                     try {
