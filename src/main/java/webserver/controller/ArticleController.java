@@ -3,6 +3,8 @@ package webserver.controller;
 import db.Database;
 import http.HttpRequest;
 import http.HttpResponse;
+import model.Article;
+import model.User;
 import webserver.AuthChecker;
 
 public class ArticleController implements Controller {
@@ -17,8 +19,9 @@ public class ArticleController implements Controller {
         String content = request.getParams("content");
         String userId = Database.getUserBySessionId(request.getCookie("sid")).getUserId();
 
-        // 저장
+        Article article = new Article(userId, content);
+        Database.addArticle(article);
 
-        // 리다이렉트
+        response.sendRedirect("/index.html");
     }
 }

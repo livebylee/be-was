@@ -10,7 +10,7 @@ public class Article {
     private String authorId;
     private LocalDateTime createdAt;
 
-    public Article(String id, String title, String content, String authorId) {
+    public Article(String authorId, String content) {
         this.id = UUID.randomUUID().toString();
         this.content = content;
         this.authorId = authorId;
