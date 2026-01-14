@@ -51,3 +51,15 @@
 - [x] 데이터 타입 만들고 저장하기
 - [x] controller mapping
 - [x] 메인 화면에서 최신 게시글 보여주기
+- [ ] db에 정렬된 상태로 들어가도록 수정하기
+
+> #### `CopyOnWriteArrayList` 
+> 
+> 다수의 스레드에서 동시에 글이 작성된다면?
+> - `Collections.synchronizedList` vs `CopyOnWriteArrayList` 
+> - 인스타그램을 모티브로한 현재 서비스에선 읽기가 훨씬 많지 않나?
+
+> #### 글을 쓰는 대로 리스트에 추가되는 현재 상황에서 굳이 정렬이 필요한가?
+> 
+> concurrency를 고려해보면 동시에 글을 올렸지만 네트워크 이슈 등의 문제로 작성 시간이 늦은 글이 더 먼저 추가될 수도 있을 듯
+> 

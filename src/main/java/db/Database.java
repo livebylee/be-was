@@ -4,13 +4,17 @@ import model.Article;
 import model.User;
 
 import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 public class Database {
     private static Map<String, User> users = new ConcurrentHashMap<>();
     private static Map<String, User> sessions = new ConcurrentHashMap<>();
     private static Map<String, Article> articles = new ConcurrentHashMap<>();
+    private static List<Article> sortedArticles = new CopyOnWriteArrayList<>();
 
     // --- User 관련 ---
     public static void addUser(User user) {
@@ -41,13 +45,15 @@ public class Database {
     // --- Article 관련 ---
     public static void addArticle(Article article) {
         articles.put(article.getId(), article);
+        sortedArticles.add(article);
+        sortedArticles.sort((a, b) -> b.getCreatedAt().compareTo(a.getCreatedAt()));
     }
 
     public static Article findArticleById(String id) {
         return articles.get(id);
     }
 
-    public static Collection<Article> findAllArticles() {
-        return articles.values();
+    public static List<Article> findAllArticles() {
+        return Collections.unmodifiableList(sortedArticles);
     }
 }

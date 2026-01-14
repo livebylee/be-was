@@ -68,14 +68,14 @@ public class IndexController implements Controller {
 
         if (articleList.isEmpty()) {
             return readFile("/index.html")
-                    .replace("{{ARTICLE_SECTION}}", "게시글이 없습니다");
+                    .replace("{{ARTICLE_SECTION}}", "게시글이 없습니다")
+                    .replace("{{USERID_SECITON", "");
         }
-        articleList.sort((a, b) -> b.getCreatedAt().compareTo(a.getCreatedAt()));
 
-        Article nowArticle = articleList.get(0);  //latest article
+        Article latestArticle = articleList.get(0);  //latest article
 
         return readFile("/index.html")
-                .replace("{{USERID_SECTION}}", nowArticle.getAuthorId())
-                .replace("{{ARTICLE_SECTION}}", nowArticle.getContent());
+                .replace("{{USERID_SECTION}}", latestArticle.getAuthorId())
+                .replace("{{ARTICLE_SECTION}}", latestArticle.getContent());
     }
 }
