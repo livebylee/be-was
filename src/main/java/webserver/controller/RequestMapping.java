@@ -16,6 +16,7 @@ public class RequestMapping {
         handlerMap.put(new MethodUrlKey(HttpMethod.POST, "/user/login"), new LoginUserController());
         handlerMap.put(new MethodUrlKey(HttpMethod.GET, "/index.html"), new IndexController());
         handlerMap.put(new MethodUrlKey(HttpMethod.GET, "/"), new IndexController());
+        handlerMap.put(new MethodUrlKey(HttpMethod.POST, "/article/new"), new ArticleController());
     }
 
     public static Controller getController(HttpMethod method, String url) {

@@ -49,4 +49,4 @@
 - [x] 폼에 입력된 데이터 받아오기
 - [x] ArticleController 
 - [x] 데이터 타입 만들고 저장하기
-- 
+- [x] controller mapping
