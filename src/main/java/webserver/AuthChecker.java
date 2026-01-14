@@ -11,16 +11,22 @@ import java.util.Set;
 public class AuthChecker {
 
     private static final Logger logger = LoggerFactory.getLogger(AuthChecker.class);
-    private static final Set<String> protectedPaths = Set.of("/mypage");
+    private static final Set<String> protectedPaths = Set.of("/mypage", "/article");
     private static final Set<String> guestOnlyPaths = Set.of("/login", "/registration");
 
     // 인증이 필요한 경로인지 확인
     public static boolean isProtectedPath(String path) {
-        return protectedPaths.contains(path);
+        String normalizedPath = path.endsWith("/") && path.length() > 1
+                ? path.substring(0, path.length() - 1)
+                : path;
+        return protectedPaths.contains(normalizedPath);
     }
 
     public static boolean isGuestOnlyPath(String path) {
-        return guestOnlyPaths.contains(path);
+        String normalizedPath = path.endsWith("/") && path.length() > 1
+                ? path.substring(0, path.length() - 1)
+                : path;
+        return guestOnlyPaths.contains(normalizedPath);
     }
 
     // 로그인 상태 확인
@@ -31,6 +37,7 @@ public class AuthChecker {
 
     public static boolean checkAuthentication(HttpRequest request, HttpResponse response) {
         String path = request.getPath();
+
 
         if (isProtectedPath(path)) {
             if (!isLoggedIn(request)) {

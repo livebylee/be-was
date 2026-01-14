@@ -8,6 +8,7 @@ import model.User;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import webserver.AuthChecker;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -24,7 +25,7 @@ class IndexControllerTest {
     void setUp() {
         indexController = new IndexController();
         // 테스트 전용 유저 생성 및 DB 저장
-        testUser = new User("tester", "password123", "테스터", "test@example.com");
+        testUser = new User("tester", "password123", "테스터123", "test@example.com");
         Database.addUser(testUser);
     }
 
@@ -75,27 +76,35 @@ class IndexControllerTest {
     @Test
     @DisplayName("로그인하지 않은 사용자가 마이페이지 접근 시 로그인 페이지로 리다이렉트 된다")
     void mypage_access_denied() {
-        // 이 테스트는 MyPageController 혹은 접근 제어 로직을 검증합니다.
-        // 여기서는 예시로 로직의 흐름을 보여줍니다.
-
-        // 1. Given: 쿠키 없는 요청
-        String requestString = "GET /mypage HTTP/1.1\r\nHost: localhost\r\n\r\n";
+        String requestString = "GET /mypage/ HTTP/1.1\r\nHost: localhost\r\n\r\n";
         HttpRequest request = new HttpRequest(new ByteArrayInputStream(requestString.getBytes()));
 
         ByteArrayOutputStream out = new ByteArrayOutputStream();
         HttpResponse response = new HttpResponse(out);
 
-        // 2. When: 접근 제어 로직 수행 (보통 Controller 내부 혹은 Interceptor에서 수행)
-        String sid = request.getCookie("sid");
-        User user = Database.getUserBySessionId(sid);
-
-        if (user == null) {
-            response.sendRedirect("/login");
-        }
-
-        // 3. Then: 302 리다이렉트 응답 확인
+        AuthChecker.checkAuthentication(request, response);
         String responseString = out.toString(StandardCharsets.UTF_8);
         assertTrue(responseString.contains("HTTP/1.1 302 Found"), "302 상태코드가 반환되어야 합니다.");
         assertTrue(responseString.contains("Location: /login"), "로그인 페이지로 리다이렉트 경로가 지정되어야 합니다.");
+    }
+
+    @Test
+    @DisplayName("로그인하지 않은 사용자가 글쓰기 페이지 접근 시 로그인 페이지로 리다이렉트 된다")
+    void articlepage_access_denied() {
+        // 1. Given: 로그인하지 않은 상태의 요청 생성
+        String requestString = "GET /article/ HTTP/1.1\r\nHost: localhost\r\n\r\n";
+        HttpRequest request = new HttpRequest(new ByteArrayInputStream(requestString.getBytes()));
+
+        ByteArrayOutputStream out = new ByteArrayOutputStream();
+        HttpResponse response = new HttpResponse(out);
+
+        // 2. When: 실제 우리가 만든 AuthChecker의 로직을 실행!
+        // 테스트 코드에서 직접 if문을 쓰지 않고, 검증 대상인 AuthChecker를 호출합니다.
+        AuthChecker.checkAuthentication(request, response);
+
+        // 3. Then: 결과 확인
+        String responseString = out.toString(StandardCharsets.UTF_8);
+        assertTrue(responseString.contains("HTTP/1.1 302 Found"), "로그인이 안 되었으므로 302 응답이 와야 함");
+        assertTrue(responseString.contains("Location: /login"), "리다이렉트 경로는 /login이어야 함");
     }
 }
