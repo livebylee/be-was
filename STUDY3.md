@@ -50,3 +50,4 @@
 - [x] ArticleController 
 - [x] 데이터 타입 만들고 저장하기
 - [x] controller mapping
+- [x] 메인 화면에서 최신 게시글 보여주기

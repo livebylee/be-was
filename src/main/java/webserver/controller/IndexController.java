@@ -4,11 +4,15 @@ import db.Database;
 import http.ContentType;
 import http.HttpRequest;
 import http.HttpResponse;
+import model.Article;
 import model.User;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import util.IOUtils;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
 import java.util.Map;
 
 public class IndexController implements Controller {
@@ -21,8 +25,10 @@ public class IndexController implements Controller {
         String sid = request.getCookie("sid");
         User user = Database.getUserBySessionId(sid);
 
+        String dynamicHtml = renderArticleSection();
+
         String authSection = renderAuthSection(user);
-        String dynamicHtml = html.replace("{{LOGIN_SECTION}}", authSection);
+        dynamicHtml = dynamicHtml.replace("{{LOGIN_SECTION}}", authSection);
 
         response.sendBody(dynamicHtml, ContentType.HTML); // 바뀐 내용 전달
     }
@@ -55,5 +61,21 @@ public class IndexController implements Controller {
         }
         String logoutHtml = readFile("/fragments/nav_logout.html");
         return logoutHtml.replace("{{userName}}", user.getName());
+    }
+
+    private String renderArticleSection() {
+        List<Article> articleList = new ArrayList<>(Database.findAllArticles());
+
+        if (articleList.isEmpty()) {
+            return readFile("/index.html")
+                    .replace("{{ARTICLE_SECTION}}", "게시글이 없습니다");
+        }
+        articleList.sort((a, b) -> b.getCreatedAt().compareTo(a.getCreatedAt()));
+
+        Article nowArticle = articleList.get(0);  //latest article
+
+        return readFile("/index.html")
+                .replace("{{USERID_SECTION}}", nowArticle.getAuthorId())
+                .replace("{{ARTICLE_SECTION}}", nowArticle.getContent());
     }
 }
