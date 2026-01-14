@@ -2,9 +2,7 @@ package webserver;
 
 import java.io.*;
 import java.net.Socket;
-import java.util.Set;
 
-import db.Database;
 import http.HttpMethod;
 import http.HttpRequest;
 import http.HttpResponse;
