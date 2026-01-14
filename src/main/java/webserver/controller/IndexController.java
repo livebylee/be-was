@@ -20,20 +20,24 @@ public class IndexController implements Controller {
 
 
     public void process(HttpRequest request, HttpResponse response) {
-        String html = readFile("/index.html");
+        try {
+            String html = readFile("/index.html");
 
-        String sid = request.getCookie("sid");
-        User user = Database.getUserBySessionId(sid);
+            String sid = request.getCookie("sid");
+            User user = Database.getUserBySessionId(sid);
 
-        String targetId = request.getParams("id");
-        html = renderArticleSection(html, targetId);
+            String targetId = request.getParams("id");
+            html = renderArticleSection(html, targetId);
 
-        String authSection = renderAuthSection(user);
-        html = html.replace("{{LOGIN_SECTION}}", authSection);
+            String authSection = renderAuthSection(user);
+            html = html.replace("{{LOGIN_SECTION}}", authSection);
 
-        response.sendBody(html, ContentType.HTML); // 바뀐 내용 전달
+            response.sendBody(html, ContentType.HTML); // 바뀐 내용 전달
+        } catch (IllegalArgumentException e) {
+            logger.warn("article not found: {}", e.getMessage());
+            response.sendRedirect("/");
+        }
     }
-
 
     private String readFile(String filePath) {
         String resourcePath = filePath;
@@ -68,20 +72,26 @@ public class IndexController implements Controller {
         List<Article> articleList = new ArrayList<>(Database.findAllArticles());
 
         if (articleList.isEmpty()) {
-            return readFile("/index.html")
+            logger.info("No articles found in database.");
+            return html
                     .replace("{{ARTICLE_SECTION}}", "게시글이 없습니다")
-                    .replace("{{USERID_SECITON", "")
+                    .replace("{{USERID_SECTION}}", "")
                     .replace("{{PREV_DISABLED}}", "btn-disabled")
                     .replace("{{NEXT_DISABLED}}", "btn-disabled");
         }
 
         int currentIndex = 0;
         if (targetId != null) {
+            boolean found = false;
             for (int i = 0; i < articleList.size(); i++) {
                 if (articleList.get(i).getId().equals(targetId)) {
                     currentIndex = i;
+                    found = true;
                     break;
                 }
+            }
+            if (!found) {
+                throw new IllegalArgumentException("Invalid article ID: " + targetId);
             }
         }
 

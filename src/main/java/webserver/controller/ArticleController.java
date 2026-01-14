@@ -24,6 +24,8 @@ public class ArticleController implements Controller {
         String content = request.getParams("content");
         User user = Database.getUserBySessionId(request.getCookie("sid"));
 
+        //content 검증 (null) logic 필요
+
         if (content.length() > MAX_CONTENT_LENGTH) {
             logger.warn("content 길이 제한 초과: {} characters (max: {})", content.length(), MAX_CONTENT_LENGTH);
             response.sendRedirect("/article");
@@ -41,6 +43,8 @@ public class ArticleController implements Controller {
         Database.addArticle(article);
         logger.debug("New article created by user: {}, content length: {}", userId, content.length());
 
-        response.sendRedirect("/index.html");
+
+        response.sendRedirect("/index.html?id=" + article.getId());
+
     }
 }
