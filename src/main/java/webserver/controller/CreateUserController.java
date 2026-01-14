@@ -14,16 +14,17 @@ public class CreateUserController implements Controller {
 
 
     public void process(HttpRequest request, HttpResponse response) {
-        Map<String, String> params = request.getParams();
-        User user = new User(
-                params.get("userId"),
-                params.get("password"),
-                params.get("name"),
-                params.get("email")
-        );  //이게 효율적인? 적합한 방법인지 모르겟다..
+        try {
+            Map<String, String> params = request.getParams();
+            User user = new User(
+                    params.get("userId"),
+                    params.get("password"),
+                    params.get("name"),
+                    params.get("email")
+            );  //이게 효율적인? 적합한 방법인지 모르겟다..
 
-        logger.debug("New User created : {}", user);
-        Database.addUser(user);
+            logger.debug("New User created : {}", user);
+            Database.addUser(user);
 
         response.sendRedirect("/login/index.html");
     }

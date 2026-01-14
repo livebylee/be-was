@@ -154,6 +154,46 @@ public class HttpRequest {
         }
     }
 
+    private void parseHeaders(BufferedReader br) throws IOException {
+        String line;
+        while ((line = br.readLine()) != null && !line.isEmpty()) {
+            String[] headerTokens = line.split(":");
+            if (headerTokens.length >= 2) {
+                String key = headerTokens[0].trim();
+                String value = line.substring(line.indexOf(":") + 1).trim();
+                headers.put(key, value);
+            }
+            HttpRequest.logger.debug("Header: {}", line);
+        }
+    }
+
+    private void parseBody(BufferedReader br) throws IOException {
+        int contentLength = Integer.parseInt(headers.get("Content-Length"));
+
+        // 텍스트 데이터 기준 ( byte 방식으로 변환 필요)
+        char[] bodyChars = new char[contentLength];
+        int readCount = 0;
+        while (readCount < contentLength) {
+            int result = br.read(bodyChars, readCount, contentLength - readCount);
+            if (result == -1) break;
+            readCount += result;
+        }
+        String body = new String(bodyChars, 0, readCount);
+
+        ContentType contentType = ContentType.from(headers.get("Content-Type"));
+
+        switch (contentType) {
+            case FORM_URLENCODED:
+                parseQueryString(body);
+                HttpRequest.logger.debug("Body Params (Form) : {}", params);
+                break;
+
+            default:
+                HttpRequest.logger.warn("지원하지 않는 컨텐츠타입 : {}", contentType);
+                throw new IllegalArgumentException("Unsupported Content-Type: " + contentType);
+        }
+    }
+
     public String getPath() {
         return this.path;
     }
