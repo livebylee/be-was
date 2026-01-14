@@ -2,7 +2,9 @@ package webserver;
 
 import java.io.*;
 import java.net.Socket;
+import java.util.Set;
 
+import db.Database;
 import http.HttpMethod;
 import http.HttpRequest;
 import http.HttpResponse;
@@ -18,10 +20,11 @@ public class RequestHandler implements Runnable {
     private static final Logger logger = LoggerFactory.getLogger(RequestHandler.class);
 
     private Socket connection;
-    private static final StaticResourceProcessor processor = new StaticResourceProcessor();
+    private final StaticResourceProcessor processor;
 
-    public RequestHandler(Socket connectionSocket) {
+    public RequestHandler(Socket connectionSocket, StaticResourceProcessor staticResourceProcessor) {
         this.connection = connectionSocket;
+        this.processor = staticResourceProcessor;
     }
 
     public void run() {
@@ -37,6 +40,11 @@ public class RequestHandler implements Runnable {
             try {
                 HttpRequest request = new HttpRequest(in);
                 String path = request.getPath();
+
+                if (AuthChecker.checkAuthentication(request, response)) {
+                    return;
+                }
+
                 HttpMethod method = request.getMethod();
                 Controller controller = RequestMapping.getController(method, path);
 
@@ -45,7 +53,7 @@ public class RequestHandler implements Runnable {
                 } else if (RequestMapping.isExistUrl(path)) {  //url 있는데 메소드 틀림
                     //response.response405; //추후 구현
                 } else if (processor.isExistPath(path)) {
-                    processor.process(path, response);
+                    processor.process(request, response);
                 } else {
                     response.sendError(HttpStatus.NOT_FOUND, " 404 error");
                 }

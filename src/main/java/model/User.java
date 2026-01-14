@@ -1,5 +1,7 @@
 package model;
 
+import db.Database;
+
 public class User {
     private String userId;
     private String password;
@@ -7,12 +9,20 @@ public class User {
     private String email;
 
     public User(String userId, String password, String name, String email) {
-        validate(userId, "userId");
-        validate(password, "password");
-        validate(name, "name");
+        validate(userId, "아이디를 4자 이상 입력해주세요.");
+        validate(password, "비밀번호를 4자 이상 입력해주세요.");
+        validate(name, "이름을 4자 이상 입력해주세요.");
 
-        this.userId = userId;
-        this.password = password;
+        if (Database.findUserById(userId) != null) {
+            throw new IllegalArgumentException("이미 존재하는 아이디입니다.");
+        }
+
+        if (Database.findUserByName(name) != null) {
+            throw new IllegalArgumentException("이미 존재하는 닉네임입니다.");
+        }
+
+        this.userId = userId.trim();
+        this.password = password.trim();
         this.name = name;
         this.email = email;
     }
@@ -38,9 +48,14 @@ public class User {
         return "User [userId=" + userId + ", password=" + password + ", name=" + name + ", email=" + email + "]";
     }
 
-    private void validate(String value, String fieldName) {
-        if (value == null || value.trim().isEmpty()) {
-            throw new IllegalArgumentException(fieldName + "값이 비어있습니다");
+    private void validate(String value, String errorMessage) {
+        if (value == null || value.trim().length() < 4) {
+            throw new IllegalArgumentException(errorMessage);
         }
     }
+
+    public boolean authenticate(String password) {
+        return this.password.equals(password != null ? password.trim() : "");
+    }
+
 }

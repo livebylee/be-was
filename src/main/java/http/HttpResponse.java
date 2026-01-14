@@ -13,7 +13,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class HttpResponse {
-    private static final Logger logger = LoggerFactory.getLogger(RequestHandler.class);
+    private static final Logger logger = LoggerFactory.getLogger(HttpResponse.class);
     private DataOutputStream dos;
 
     private HttpStatus status = HttpStatus.OK;
@@ -63,8 +63,16 @@ public class HttpResponse {
         this.send();
     }
 
+    public void forwardWithContentType(byte[] body, String contentType) {
+        this.status = HttpStatus.OK;
+        this.addHeader("Content-Type", contentType);
+        this.setBody(body);
+        this.send();
+    }
+
     public void sendRedirect(HttpStatus status, String url) {
         this.status = status;
+        this.body = new byte[0];
         this.addHeader("Location", url);
         this.send();
     }
@@ -78,6 +86,14 @@ public class HttpResponse {
         this.status = status;
         this.addHeader("Content-Type", "text/html;charset=utf-8");
         this.setBody(message.getBytes(StandardCharsets.UTF_8));
+        this.send();
+    }
+
+    public void sendBody(String content, ContentType contentType) {
+        byte[] bodyBytes = content.getBytes(StandardCharsets.UTF_8);
+        this.status = HttpStatus.OK;
+        this.addHeader("Content-Type", contentType.getValue() + ";charset=utf-8");
+        this.setBody(bodyBytes);
         this.send();
     }
 }
