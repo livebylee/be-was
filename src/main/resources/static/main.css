@@ -140,6 +140,12 @@
   color: #14212b;
 }
 
+.btn-disabled {
+    opacity: 0.5;
+    pointer-events: none;
+    cursor: not-allowed;
+}
+
 .nav__menu__item__img {
   width: 32px;
   height: 32px;
