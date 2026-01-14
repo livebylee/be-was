@@ -1,28 +1,24 @@
 package model;
 
 import java.time.LocalDateTime;
+import java.util.UUID;
 
 public class Article {
-    private Long id;
+    private String id;
     private String title;
     private String content;
     private String authorId;
     private LocalDateTime createdAt;
 
-    public Article(Long id, String title, String content, String authorId) {
-        this.id = id;
-        this.title = title;
+    public Article(String id, String title, String content, String authorId) {
+        this.id = UUID.randomUUID().toString();
         this.content = content;
         this.authorId = authorId;
         this.createdAt = LocalDateTime.now();
     }
 
-    public Long getId() {
+    public String getId() {
         return id;
-    }
-
-    public String getTitle() {
-        return title;
     }
 
     public String getContent() {
