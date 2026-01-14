@@ -25,12 +25,13 @@ public class IndexController implements Controller {
         String sid = request.getCookie("sid");
         User user = Database.getUserBySessionId(sid);
 
-        String dynamicHtml = renderArticleSection();
+        String targetId = request.getParams("id");
+        html = renderArticleSection(html, targetId);
 
         String authSection = renderAuthSection(user);
-        dynamicHtml = dynamicHtml.replace("{{LOGIN_SECTION}}", authSection);
+        html = html.replace("{{LOGIN_SECTION}}", authSection);
 
-        response.sendBody(dynamicHtml, ContentType.HTML); // 바뀐 내용 전달
+        response.sendBody(html, ContentType.HTML); // 바뀐 내용 전달
     }
 
 
@@ -63,19 +64,51 @@ public class IndexController implements Controller {
         return logoutHtml.replace("{{userName}}", user.getName());
     }
 
-    private String renderArticleSection() {
+    private String renderArticleSection(String html, String targetId) {
         List<Article> articleList = new ArrayList<>(Database.findAllArticles());
 
         if (articleList.isEmpty()) {
             return readFile("/index.html")
                     .replace("{{ARTICLE_SECTION}}", "게시글이 없습니다")
-                    .replace("{{USERID_SECITON", "");
+                    .replace("{{USERID_SECITON", "")
+                    .replace("{{PREV_DISABLED}}", "btn-disabled")
+                    .replace("{{NEXT_DISABLED}}", "btn-disabled");
         }
 
-        Article latestArticle = articleList.get(0);  //latest article
+        int currentIndex = 0;
+        if (targetId != null) {
+            for (int i = 0; i < articleList.size(); i++) {
+                if (articleList.get(i).getId().equals(targetId)) {
+                    currentIndex = i;
+                    break;
+                }
+            }
+        }
 
-        return readFile("/index.html")
-                .replace("{{USERID_SECTION}}", latestArticle.getAuthorId())
-                .replace("{{ARTICLE_SECTION}}", latestArticle.getContent());
+        Article nowArticle = articleList.get(currentIndex);
+
+        String prevId = "#";
+        String nextId = "#";
+        String prevDisabled = "";
+        String nextDisabled = "";
+
+        if (currentIndex > 0) {
+            nextId = articleList.get(currentIndex - 1).getId();
+        } else {
+            nextDisabled = "btn-disabled";
+        }
+
+        if (currentIndex < articleList.size() - 1) {
+            prevId = articleList.get(currentIndex + 1).getId();
+        } else {
+            prevDisabled = "btn-disabled";
+        }
+
+        return html.replace("{{USERID_SECTION}}", nowArticle.getAuthorId())
+                .replace("{{ARTICLE_SECTION}}", nowArticle.getContent())
+                .replace("{{PREV_ID}}", prevId)
+                .replace("{{NEXT_ID}}", nextId)
+                .replace("{{PREV_DISABLED}}", prevDisabled)
+                .replace("{{NEXT_DISABLED}}", nextDisabled);
     }
 }
