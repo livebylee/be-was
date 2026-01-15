@@ -95,3 +95,11 @@
 > -> 무한루프 발생
 > 검증 로직을 생성자에서 빼서 Controller로 옮겨 해결하였다.
 > 관심사 분리가 왜 중요한지...설계의 필요성.. 알게되었다.
+
+
+> #### multipart reqeust
+> 
+> `header` ) `content-type` ) `boundary`= 
+> : 브라우저가 랜덤생성한 구분자
+> 
+> `Body` ) 시작바운더리 + 파트헤더 + \r\n + data + \r\n + 구분바운더리 + 헤더 + \r\n + imagedata + 종료바운더리

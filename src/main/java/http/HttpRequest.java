@@ -31,24 +31,35 @@ public class HttpRequest {
 
     public HttpRequest(InputStream in) {
         try {
-            BufferedReader br = new BufferedReader(new InputStreamReader(in, StandardCharsets.UTF_8));
 
-            String line = br.readLine();
+            String line = readLine(in);
             if (line == null) return;
 
             parseRequestLine(line);
             logger.debug("Method:{}, path :{} ", method, path);
-            parseHeaders(br);
+            parseHeaders(in);
 
             if (headers.containsKey("content-length") && headers.get("content-length") != null) {
                 logger.debug("Content-Length: {}, Content-Type: {}", headers.get("content-length"), headers.get("content-type"));
-                parseBody(br);
+                parseBody(in);
             }
 
 
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    private String readLine(InputStream in) throws IOException {
+        StringBuilder sb = new StringBuilder();
+        int b;
+        while ((b = in.read()) != -1) {
+            if (b == '\r') continue;
+            if (b == '\n') break;
+            sb.append((char) b);
+        }
+        if (b == -1 && sb.length() == 0) return null;
+        return sb.toString();
     }
 
     // 여기 하드코딩 바꾸기
@@ -93,9 +104,9 @@ public class HttpRequest {
         }
     }
 
-    private void parseHeaders(BufferedReader br) throws IOException {
+    private void parseHeaders(InputStream in) throws IOException {
         String line;
-        while ((line = br.readLine()) != null && !line.isEmpty()) {
+        while (!(line = readLine(in)).isEmpty()) {
             String[] headerTokens = line.split(":");
             if (headerTokens.length >= 2) {
                 String key = headerTokens[0].trim().toLowerCase();
@@ -112,12 +123,13 @@ public class HttpRequest {
                     String[] parts = value.split("boundary=");
                     if (parts.length > 1) {
                         this.boundary = parts[1]; // HttpRequest 클래스에 필드로 저장해두면 나중에 쓰기 편해요!
-                        HttpRequest.logger.debug("Boundary found: {}", this.boundary);
+                        logger.debug("Boundary found: {}", this.boundary);
                     }
+                    logger.debug("[boundary] : " + this.boundary);
                 }
 
             }
-            HttpRequest.logger.debug("Header: {}", line);
+            logger.debug("Header: {}", line);
         }
 
     }
@@ -139,31 +151,29 @@ public class HttpRequest {
         logger.debug("Cookies: {}", cookies);
     }
 
-    private void parseBody(BufferedReader br) throws IOException {
+    private void parseBody(InputStream in) throws IOException {
         int contentLength = Integer.parseInt(headers.get("content-length"));
-
-        // 텍스트 데이터 기준 ( byte 방식으로 변환 필요)
-        char[] bodyChars = new char[contentLength];
-        int readCount = 0;
-        while (readCount < contentLength) {
-            int result = br.read(bodyChars, readCount, contentLength - readCount);
-            if (result == -1) break;
-            readCount += result;
-        }
-        String body = new String(bodyChars, 0, readCount);
+        byte[] bodyBytes = in.readNBytes(contentLength);
 
         ContentType contentType = ContentType.from(headers.get("content-type"));
 
-        switch (contentType) {
-            case FORM_URLENCODED -> {
-                parseQueryString(body);
-                HttpRequest.logger.debug("Body Params (Form) : {}", params);
-            }
-            default -> {
-                HttpRequest.logger.warn("지원하지 않는 컨텐츠타입 : {}", contentType);
-                throw new IllegalArgumentException("Unsupported Content-Type: " + contentType);
-            }
+        if (boundary != null || (contentType != null && contentType == ContentType.MULTIPART)) {
+            HttpRequest.logger.debug("멀티파트 데이터 파싱 시작 (바운더리: {})", boundary);
+            parseMultipartBody(bodyBytes);
+        } else if (contentType != null && contentType == ContentType.FORM_URLENCODED) {
+            String body = new String(bodyBytes, StandardCharsets.UTF_8);
+            parseQueryString(body);
+            HttpRequest.logger.debug("일반 폼 데이터 파싱 완료: {}", params);
+        } else {
+            HttpRequest.logger.warn("지원하지 않는 컨텐츠타입");
+            throw new IllegalArgumentException("Unsupported Content-Type: " + contentType);
         }
+
+    }
+
+    private void parseMultipartBody(byte[] bodyBytes) {
+        // 추후 구현
+        logger.debug("Multipart body size: {} bytes", bodyBytes.length);
     }
 
     public String getPath() {
