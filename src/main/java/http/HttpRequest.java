@@ -23,6 +23,7 @@ public class HttpRequest {
     private HttpMethod method;
     private String path;
     private String queryString;
+    private String boundary;
     private Map<String, String> headers = new HashMap<>();
     private Map<String, String> params = new HashMap<>();
     private Map<String, String> cookies = new HashMap<>();
@@ -105,9 +106,20 @@ public class HttpRequest {
                 if ("Cookie".equalsIgnoreCase(key)) {
                     parseCookies(value);
                 }
+                // multipart : boundary파싱
+                if ("content-type".equals(key) && value.contains("multipart/form-data")) {
+                    // value 예시: "multipart/form-data; boundary=----WebKitFormBoundary..."
+                    String[] parts = value.split("boundary=");
+                    if (parts.length > 1) {
+                        this.boundary = parts[1]; // HttpRequest 클래스에 필드로 저장해두면 나중에 쓰기 편해요!
+                        HttpRequest.logger.debug("Boundary found: {}", this.boundary);
+                    }
+                }
+
             }
             HttpRequest.logger.debug("Header: {}", line);
         }
+
     }
 
     private void parseCookies(String cookieHeader) {
