@@ -17,9 +17,8 @@ import java.util.concurrent.CopyOnWriteArrayList;
 public class Database {
     private static final Logger logger = LoggerFactory.getLogger(Database.class);
 
-    //private static Map<String, User> users = new ConcurrentHashMap<>();
     private static Map<String, User> sessions = new ConcurrentHashMap<>();
-    private static Map<String, Article> articles = new ConcurrentHashMap<>();
+    //private static Map<String, Article> articles = new ConcurrentHashMap<>();
     private static List<Article> sortedArticles = new CopyOnWriteArrayList<>();
 
     // --- User 관련 ---
@@ -116,16 +115,70 @@ public class Database {
 
     // --- Article 관련 ---
     public static void addArticle(Article article) {
-        articles.put(article.getId(), article);
-        sortedArticles.add(article);
-        sortedArticles.sort((a, b) -> b.getCreatedAt().compareTo(a.getCreatedAt()));
+        String sql = "INSERT INTO ARTICLE (ID, AUTHOR_ID, CONTENT, IMAGE_PATH) VALUES (?, ?, ?, ?)";
+
+        try (Connection conn = DBConnection.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+
+            pstmt.setString(1, article.getId());
+            pstmt.setString(2, article.getAuthorId());
+            pstmt.setString(3, article.getContent());
+            pstmt.setString(4, article.getImagePath());
+
+            pstmt.executeUpdate();
+            System.out.println(" [DB 저장 성공] 작성자: " + article.getAuthorId());
+
+        } catch (SQLException e) {
+            System.err.println(" [DB 저장 실패] error: " + e.getMessage());
+            e.printStackTrace();
+        }
     }
 
     public static Article findArticleById(String id) {
-        return articles.get(id);
+        String sql = "SELECT * FROM ARTICLE WHERE ID = ?";
+
+        try (Connection conn = DBConnection.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+
+            pstmt.setString(1, id);
+
+            try (ResultSet rs = pstmt.executeQuery()) {
+                if (rs.next()) {
+                    return new Article(
+                            rs.getString("ID"),
+                            rs.getString("AUTHOR_ID"),
+                            rs.getString("CONTENT"),
+                            rs.getString("IMAGE_PATH"),
+                            rs.getTimestamp("CREATED_AT").toLocalDateTime()
+                    );
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return null;
     }
 
     public static List<Article> findAllArticles() {
-        return Collections.unmodifiableList(sortedArticles);
+        List<Article> articles = new ArrayList<>();
+        String sql = "SELECT * FROM ARTICLE ORDER BY CREATED_AT DESC";
+
+        try (Connection conn = DBConnection.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(sql);
+             ResultSet rs = pstmt.executeQuery()) {
+
+            while (rs.next()) {
+                articles.add(new Article(
+                        rs.getString("ID"),
+                        rs.getString("AUTHOR_ID"),
+                        rs.getString("CONTENT"),
+                        rs.getString("IMAGE_PATH"),
+                        rs.getTimestamp("CREATED_AT").toLocalDateTime()
+                ));
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return articles;
     }
 }
