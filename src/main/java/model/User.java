@@ -6,9 +6,8 @@ public class User {
     private String userId;
     private String password;
     private String name;
-    private String email;
 
-    public User(String userId, String password, String name, String email) {
+    public User(String userId, String password, String name) {
         validate(userId, "아이디를 4자 이상 입력해주세요.");
         validate(password, "비밀번호를 4자 이상 입력해주세요.");
         validate(name, "이름을 4자 이상 입력해주세요.");
@@ -24,7 +23,6 @@ public class User {
         this.userId = userId.trim();
         this.password = password.trim();
         this.name = name;
-        this.email = email;
     }
 
     public String getUserId() {
@@ -39,13 +37,9 @@ public class User {
         return name;
     }
 
-    public String getEmail() {
-        return email;
-    }
-
     @Override
     public String toString() {
-        return "User [userId=" + userId + ", password=" + password + ", name=" + name + ", email=" + email + "]";
+        return "User [userId=" + userId + ", password=" + password + ", name=" + name +"]";
     }
 
     private void validate(String value, String errorMessage) {

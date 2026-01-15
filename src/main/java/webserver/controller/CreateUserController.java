@@ -18,8 +18,7 @@ public class CreateUserController implements Controller {
         User user = new User(
                 params.get("userId"),
                 params.get("password"),
-                params.get("name"),
-                params.get("email")
+                params.get("name")
         );  //이게 효율적인? 적합한 방법인지 모르겟다..
 
         logger.debug("New User created : {}", user);
