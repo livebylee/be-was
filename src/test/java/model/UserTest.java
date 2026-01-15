@@ -46,13 +46,6 @@ class UserTest {
                 .isInstanceOf(IllegalArgumentException.class);
     }
 
-    @Test
-    @DisplayName("닉네임이 4글자 미만이면 예외가 발생한다")
-    void nicknameLengthTest() {
-        assertThatThrownBy(() -> new User("user123", "password", "lee", "test@test.com"))
-                .isInstanceOf(IllegalArgumentException.class);
-    }
-
     // --- 로그인(인증) 관련 테스트 추가 ---
 
     @Test

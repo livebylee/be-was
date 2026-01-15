@@ -15,6 +15,20 @@ public class CreateUserController implements Controller {
 
     public void process(HttpRequest request, HttpResponse response) {
         Map<String, String> params = request.getParams();
+        String userId = request.getParams("userId");
+        String name = request.getParams("name");
+
+        if (Database.findUserById(userId) != null) {
+            logger.error("이미 존재하는 아이디입니다: {}", userId);
+            return;
+        }
+
+        // 2. 중복 닉네임 확인
+        if (Database.findUserByName(name) != null) {
+            logger.error("이미 존재하는 닉네임입니다: {}", name);
+            return;
+        }
+
         User user = new User(
                 params.get("userId"),
                 params.get("password"),

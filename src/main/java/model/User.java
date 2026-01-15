@@ -12,14 +12,6 @@ public class User {
         validate(password, "비밀번호를 4자 이상 입력해주세요.");
         validate(name, "이름을 4자 이상 입력해주세요.");
 
-        if (Database.findUserById(userId) != null) {
-            throw new IllegalArgumentException("이미 존재하는 아이디입니다.");
-        }
-
-        if (Database.findUserByName(name) != null) {
-            throw new IllegalArgumentException("이미 존재하는 닉네임입니다.");
-        }
-
         this.userId = userId.trim();
         this.password = password.trim();
         this.name = name;
@@ -39,7 +31,7 @@ public class User {
 
     @Override
     public String toString() {
-        return "User [userId=" + userId + ", password=" + password + ", name=" + name +"]";
+        return "User [userId=" + userId + ", password=" + password + ", name=" + name + "]";
     }
 
     private void validate(String value, String errorMessage) {
