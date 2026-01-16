@@ -46,4 +46,19 @@ public class IOUtils {
         }
     }
 
+    // 바이트 배열에서 특정 패턴의 시작 위치를 찾는 메서드
+    public static int indexOf(byte[] data, byte[] pattern, int start) {
+        for (int i = start; i <= data.length - pattern.length; i++) {
+            boolean match = true;
+            for (int j = 0; j < pattern.length; j++) {
+                if (data[i + j] != pattern[j]) {
+                    match = false;
+                    break;
+                }
+            }
+            if (match) return i;
+        }
+        return -1;
+    }
+
 }

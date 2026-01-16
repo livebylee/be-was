@@ -15,6 +15,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import static http.HttpMethod.from;
+import static util.IOUtils.indexOf;
 
 
 public class HttpRequest {
@@ -172,8 +173,45 @@ public class HttpRequest {
     }
 
     private void parseMultipartBody(byte[] bodyBytes) {
-        // 추후 구현
-        logger.debug("Multipart body size: {} bytes", bodyBytes.length);
+        try {
+            byte[] boundaryBytes = ("--" + this.boundary).getBytes(StandardCharsets.UTF_8);
+            byte[] doubleCrlf = "\r\n\r\n".getBytes(StandardCharsets.UTF_8);
+
+            int startPos = indexOf(bodyBytes, boundaryBytes, 0);
+
+            while (startPos != -1) {
+                int nextBoundaryPos = indexOf(bodyBytes, boundaryBytes, startPos + boundaryBytes.length);
+                if (nextBoundaryPos == -1) break;
+
+                // 2. 현재 파트의 전체 데이터 추출 (바운더리 사이의 구간)
+                // 파트 시작 위치: startPos + boundaryBytes.length + 2 (\r\n)
+                // 파트 끝 위치: nextBoundaryPos - 2 (\r\n)
+                int partStart = startPos + boundaryBytes.length + 2;
+                int partEnd = nextBoundaryPos - 2;
+
+                // 3. 파트 내에서 헤더와 데이터의 경계(\r\n\r\n) 찾기
+                int headerEnd = indexOf(bodyBytes, doubleCrlf, partStart);
+                if (headerEnd != -1 && headerEnd < partEnd) {
+                    // 파트 헤더 추출
+                    String partHeader = new String(bodyBytes, partStart, headerEnd - partStart, StandardCharsets.UTF_8);
+
+                    // 실제 데이터 시작 및 끝 계산
+                    int dataStart = headerEnd + doubleCrlf.length;
+                    int dataEnd = partEnd;
+                    byte[] data = java.util.Arrays.copyOfRange(bodyBytes, dataStart, dataEnd);
+
+                    // 4. 헤더 분석 후 처리
+                    processPart(partHeader, data);
+                }
+                startPos = nextBoundaryPos;
+            }
+        } catch (Exception e) {
+            logger.error("멀티파트 파싱 중 에러 발생: {}", e.getMessage());
+        }
+    }
+
+    private void processPart(String header, byte[] data) {
+        // 실제 처리
     }
 
     public String getPath() {
