@@ -38,7 +38,7 @@ public class ArticleController implements Controller {
         }
 
         String userId = user.getUserId();
-        String imagePath = "";  // 추후 로직 구현
+        String imagePath = request.getImagePath();
 
         Article article = new Article(userId, content, imagePath);
         Database.addArticle(article);

@@ -211,7 +211,47 @@ public class HttpRequest {
     }
 
     private void processPart(String header, byte[] data) {
-        // 실제 처리
+        if (header.contains("filename=")) {
+            // [파일 파트] - 이미지
+            String fileName = extractFileName(header);
+            params.put("imagePath", fileName);
+            logger.debug("파일 파트 발견: {}, 크기: {} bytes", fileName, data.length);
+
+            // 임시 저장 테스트 (나중에 분리)
+            saveFile(fileName, data);
+        } else {
+            // [텍스트 파트] - content 등
+            String name = extractName(header);
+            String value = new String(data, StandardCharsets.UTF_8);
+            params.put(name, value);
+            logger.debug("텍스트 파트 발견: {} = {}", name, value);
+        }
+    }
+
+    private String extractName(String header) {
+        // Content-Disposition: form-data; name="content" 에서 content 추출
+        int start = header.indexOf("name=\"") + 6;
+        int end = header.indexOf("\"", start);
+        return header.substring(start, end);
+    }
+
+    private String extractFileName(String header) {
+        // Content-Disposition: form-data; name="image"; filename="dog.png" 에서 dog.png 추출
+        int start = header.indexOf("filename=\"") + 10;
+        int end = header.indexOf("\"", start);
+        return header.substring(start, end);
+    }
+
+    // 일단 작동 확인을 위한 임시 저장 메서드
+    private void saveFile(String fileName, byte[] data) {
+        try {
+            java.nio.file.Path path = java.nio.file.Paths.get("src/main/resources/static/img_uploads/" + fileName);
+            java.nio.file.Files.createDirectories(path.getParent());
+            java.nio.file.Files.write(path, data);
+            logger.debug("파일 저장 완료: {}", path.toAbsolutePath());
+        } catch (IOException e) {
+            logger.error("파일 저장 실패: {}", e.getMessage());
+        }
     }
 
     public String getPath() {
@@ -240,5 +280,9 @@ public class HttpRequest {
 
     public String getCookie(String key) {
         return this.cookies.get(key);
+    }
+
+    public String getImagePath() {
+        return this.getParams("imagePath");
     }
 }
