@@ -35,8 +35,8 @@ public class CreateUserController implements Controller {
                 params.get("name")
         );  //이게 효율적인? 적합한 방법인지 모르겟다..
 
-        logger.debug("New User created : {}", user);
-        Database.addUser(user);
+            logger.debug("New User created : {}", user);
+            Database.addUser(user);
 
         response.sendRedirect("/login/index.html");
     }
