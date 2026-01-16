@@ -3,12 +3,9 @@ package http;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import util.IOUtils;
-import webserver.RequestHandler;
 
-import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
@@ -214,11 +211,11 @@ public class HttpRequest {
         if (header.contains("filename=")) {
             // [파일 파트] - 이미지
             String fileName = extractFileName(header);
-            params.put("imagePath", fileName);
             logger.debug("파일 파트 발견: {}, 크기: {} bytes", fileName, data.length);
 
             // 임시 저장 테스트 (나중에 분리)
-            saveFile(fileName, data);
+            String uniquenessName = IOUtils.saveFile(fileName, data);
+            params.put("imagePath", uniquenessName);
         } else {
             // [텍스트 파트] - content 등
             String name = extractName(header);
@@ -240,18 +237,6 @@ public class HttpRequest {
         int start = header.indexOf("filename=\"") + 10;
         int end = header.indexOf("\"", start);
         return header.substring(start, end);
-    }
-
-    // 일단 작동 확인을 위한 임시 저장 메서드
-    private void saveFile(String fileName, byte[] data) {
-        try {
-            java.nio.file.Path path = java.nio.file.Paths.get("img_uploads/" + fileName);
-            java.nio.file.Files.createDirectories(path.getParent());
-            java.nio.file.Files.write(path, data);
-            logger.debug("파일 저장 완료: {}", path.toAbsolutePath());
-        } catch (IOException e) {
-            logger.error("파일 저장 실패: {}", e.getMessage());
-        }
     }
 
     public String getPath() {

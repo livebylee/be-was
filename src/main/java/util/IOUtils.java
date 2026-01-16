@@ -1,11 +1,18 @@
 package util;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
+import java.util.UUID;
+
 
 public class IOUtils {
+    private static final Logger logger = LoggerFactory.getLogger(IOUtils.class);
+
     private IOUtils() {
     }
 
@@ -61,4 +68,22 @@ public class IOUtils {
         return -1;
     }
 
+    public static String saveFile(String fileName, byte[] data) {
+        try {
+            String uniqueFileName = UUID.randomUUID().toString() + "_" + fileName;
+
+            String uploadDir = "img_uploads/";
+            java.nio.file.Path path = java.nio.file.Paths.get(uploadDir + uniqueFileName);
+
+            java.nio.file.Files.createDirectories(path.getParent());
+            java.nio.file.Files.write(path, data);
+
+            logger.debug("파일 저장 완료: {}", uniqueFileName);
+            return uniqueFileName;
+        } catch (IOException e) {
+            logger.error("파일 저장 실패: {}", e.getMessage());
+            return "";
+        }
+
+    }
 }
