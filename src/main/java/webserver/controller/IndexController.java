@@ -74,6 +74,7 @@ public class IndexController implements Controller {
         if (articleList.isEmpty()) {
             logger.info("No articles found in database.");
             return html
+                    .replace("{{IMAGE_SECTION}}", "이미지가 없습니다")
                     .replace("{{ARTICLE_SECTION}}", "게시글이 없습니다")
                     .replace("{{USERID_SECTION}}", "")
                     .replace("{{PREV_DISABLED}}", "btn-disabled")
@@ -114,8 +115,15 @@ public class IndexController implements Controller {
             prevDisabled = "btn-disabled";
         }
 
+        String imageTag = "";
+        if (nowArticle.getImagePath() != null && !nowArticle.getImagePath().isEmpty()) {
+            // DB에 저장된 파일명을 사용하여 img 태그를 생성합니다.
+            imageTag = "<img class=\"post__img\" src=\"/img_uploads/" + nowArticle.getImagePath() + "\" />";
+        }
+
         return html.replace("{{USERID_SECTION}}", nowArticle.getAuthorId())
                 .replace("{{ARTICLE_SECTION}}", nowArticle.getContent())
+                .replace("{{IMAGE_SECTION}}", imageTag)
                 .replace("{{PREV_ID}}", prevId)
                 .replace("{{NEXT_ID}}", nextId)
                 .replace("{{PREV_DISABLED}}", prevDisabled)

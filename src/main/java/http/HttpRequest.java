@@ -245,7 +245,7 @@ public class HttpRequest {
     // 일단 작동 확인을 위한 임시 저장 메서드
     private void saveFile(String fileName, byte[] data) {
         try {
-            java.nio.file.Path path = java.nio.file.Paths.get("src/main/resources/static/img_uploads/" + fileName);
+            java.nio.file.Path path = java.nio.file.Paths.get("img_uploads/" + fileName);
             java.nio.file.Files.createDirectories(path.getParent());
             java.nio.file.Files.write(path, data);
             logger.debug("파일 저장 완료: {}", path.toAbsolutePath());
