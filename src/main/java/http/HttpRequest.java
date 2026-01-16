@@ -211,6 +211,11 @@ public class HttpRequest {
         if (header.contains("filename=")) {
             // [파일 파트] - 이미지
             String fileName = extractFileName(header);
+
+            if (fileName == null || fileName.isEmpty() || data.length == 0) {
+                logger.debug("파일이 전송되지 않았습니다. (Empty file part)");
+                return;
+            }
             logger.debug("파일 파트 발견: {}, 크기: {} bytes", fileName, data.length);
 
             // 임시 저장 테스트 (나중에 분리)
