@@ -24,7 +24,17 @@ public class ArticleController implements Controller {
         String content = request.getParams("content");
         User user = Database.getUserBySessionId(request.getCookie("sid"));
 
-        //content 검증 (null) logic 필요
+        String imagePath = request.getImagePath();
+
+        if (imagePath == null || imagePath.isEmpty()) {
+            logger.warn("이미지 업로드 누락: 이미지가 없는 게시글은 작성이 불가합니다.");
+            response.sendRedirect("/article");
+            return;
+        }
+
+        if (content == null) {
+            content = "";
+        }
 
         if (content.length() > MAX_CONTENT_LENGTH) {
             logger.warn("content 길이 제한 초과: {} characters (max: {})", content.length(), MAX_CONTENT_LENGTH);
@@ -38,7 +48,6 @@ public class ArticleController implements Controller {
         }
 
         String userId = user.getUserId();
-        String imagePath = request.getImagePath();
 
         Article article = new Article(userId, content, imagePath);
         Database.addArticle(article);
