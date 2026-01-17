@@ -28,7 +28,7 @@ public class ArticleController implements Controller {
 
         if (imagePath == null || imagePath.isEmpty()) {
             logger.warn("이미지 업로드 누락: 이미지가 없는 게시글은 작성이 불가합니다.");
-            response.sendRedirect("/article");
+            response.sendRedirect("/article?error=missing_image");
             return;
         }
 
@@ -38,7 +38,7 @@ public class ArticleController implements Controller {
 
         if (content.length() > MAX_CONTENT_LENGTH) {
             logger.warn("content 길이 제한 초과: {} characters (max: {})", content.length(), MAX_CONTENT_LENGTH);
-            response.sendRedirect("/article");
+            response.sendRedirect("/article?error=length_exceeded");
             return;
         }
         if (user == null) { //세션 만료 대비

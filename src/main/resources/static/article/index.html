@@ -55,5 +55,29 @@
         </form>
       </div>
     </div>
+    <script>
+      // 페이지 로드 시 실행
+      window.onload = function() {
+        const urlParams = new URLSearchParams(window.location.search);
+        const error = urlParams.get('error');
+
+        if (error === 'missing_image') {
+          alert('이미지를 업로드해야 게시글을 작성할 수 있습니다.');
+        }
+        // 2. 글자 수 초과 알림 (Controller에서 처리할 경우)
+        else if (error === 'length_exceeded') {
+          alert('내용이 너무 깁니다. (최대 10,000자)');
+        }
+
+        const showAllBtn = document.getElementById('show-all-btn');
+        if (showAllBtn) {
+          showAllBtn.addEventListener('click', function() {
+            const hiddenComments = document.querySelectorAll('.comment__item.hidden');
+            hiddenComments.forEach(comment => comment.classList.remove('hidden'));
+            this.style.display = 'none';
+          });
+        }
+      };
+    </script>
   </body>
 </html>
