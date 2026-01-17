@@ -104,15 +104,15 @@ public class IndexController implements Controller {
         String nextDisabled = "";
 
         if (currentIndex > 0) {
-            nextId = articleList.get(currentIndex - 1).getId();
+            prevId = articleList.get(currentIndex - 1).getId();
         } else {
-            nextDisabled = "btn-disabled";
+            prevDisabled = "btn-disabled";
         }
 
         if (currentIndex < articleList.size() - 1) {
-            prevId = articleList.get(currentIndex + 1).getId();
+            nextId = articleList.get(currentIndex + 1).getId();
         } else {
-            prevDisabled = "btn-disabled";
+            nextDisabled = "btn-disabled";
         }
 
         String imageTag = "";
